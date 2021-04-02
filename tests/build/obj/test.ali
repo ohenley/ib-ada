@@ -1,0 +1,127 @@
+V "GNAT Lib v2020"
+M P W=b
+A -gnatA
+A -mtune=generic
+A -march=x86-64
+P SS ZX
+
+RN
+RV NO_IO
+RV NO_IMPLEMENTATION_PRAGMAS
+
+U test%b		test.adb		fc6b6adf NE OO SU IL
+W ada%s			ada.ads			ada.ali
+Z ada.tags%s		a-tags.adb		a-tags.ali
+W ada.text_io%s		a-textio.adb		a-textio.ali
+W ib_ada%s		ib_ada.adb		ib_ada.ali
+W ib_ada.communication%s  ib_ada-communication.adb  ib_ada-communication.ali
+W ib_ada.conn%s		ib_ada-conn.adb		ib_ada-conn.ali
+Z system%s		system.ads		system.ali
+Z system.tasking%s	s-taskin.adb		s-taskin.ali
+Z system.tasking.rendezvous%s  s-tasren.adb	s-tasren.ali
+
+D ada.ads		20200228061810 76789da1 ada%s
+D a-calend.ads		20200228061810 474d9720 ada.calendar%s
+D a-charac.ads		20200228061810 2d3ec45b ada.characters%s
+D a-chlat1.ads		20200228061810 66457d31 ada.characters.latin_1%s
+D a-contai.ads		20200228061810 61e5e089 ada.containers%s
+D a-cohata.ads		20200228061810 80a8c839 ada.containers.hash_tables%s
+D a-conhel.ads		20200228061810 20298884 ada.containers.helpers%s
+D a-cihama.ads		20200228061810 bece8dbf ada.containers.indefinite_hashed_maps%s
+D a-convec.ads		20200228061810 7e2b0fdf ada.containers.vectors%s
+D a-except.ads		20200228061810 a7106115 ada.exceptions%s
+D a-finali.ads		20200228061810 bf4f806b ada.finalization%s
+D a-ioexce.ads		20200228061810 e4a01f64 ada.io_exceptions%s
+D a-iteint.ads		20200228061810 7c7305e9 ada.iterator_interfaces%s
+D a-reatim.ads		20200228061810 0240fc73 ada.real_time%s
+D a-stream.ads		20200228061810 119b8fb3 ada.streams%s
+D a-string.ads		20200228061810 90ac6797 ada.strings%s
+D a-strhas.ads		20200228061810 c71c2a52 ada.strings.hash%s
+D a-strmap.ads		20200228061810 e8bb714a ada.strings.maps%s
+D a-strunb.ads		20200304060544 1656705b ada.strings.unbounded%s
+D a-stunha.ads		20200228061810 115e053b ada.strings.unbounded.hash%s
+D a-tags.ads		20200228061810 edddc8f0 ada.tags%s
+D a-textio.ads		20200228061810 aef4d56d ada.text_io%s
+D a-unccon.ads		20200228061810 0e9b276f ada.unchecked_conversion%s
+D a-uncdea.ads		20200228061810 eff36322 ada.unchecked_deallocation%s
+D gnat.ads		20200228061810 b5988c27 gnat%s
+D g-socket.ads		20200228061810 af0c6c01 gnat.sockets%s
+D ib_ada.ads		20210401001824 691c47e3 ib_ada%s
+D ib_ada-communication.ads  20210402120342 9aa73b15 ib_ada.communication%s
+D ib_ada-conn.ads	20210331143114 96ccd2d2 ib_ada.conn%s
+D interfac.ads		20200228061810 5ab55268 interfaces%s
+D i-c.ads		20200228061810 c624fa43 interfaces.c%s
+D i-cstrin.ads		20200228061810 341d0ddf interfaces.c.strings%s
+D i-cstrea.ads		20200228061810 e53d8b8e interfaces.c_streams%s
+D system.ads		20200228061810 32a08138 system%s
+D s-atacco.ads		20200228061810 4c36d12f system.address_to_access_conversions%s
+D s-atocou.ads		20200228061810 b45c2d8d system.atomic_counters%s
+D s-crtl.ads		20200228061810 0ebbdb71 system.crtl%s
+D s-exctab.ads		20200228061810 54135002 system.exception_table%s
+D s-ficobl.ads		20200228061810 078245e4 system.file_control_block%s
+D s-finmas.ads		20200228061810 7811a767 system.finalization_masters%s
+D s-finroo.ads		20200228061810 4ff27390 system.finalization_root%s
+D s-imenne.ads		20200228061810 614c06c0 system.img_enum_new%s
+D s-multip.ads		20200228061810 38ac9f73 system.multiprocessors%s
+D s-oscons.ads		20200430144824 eb29530f system.os_constants%s
+D s-osinte.ads		20200228061810 97504df8 system.os_interface%s
+D s-parame.ads		20200228061810 4752c4cb system.parameters%s
+D s-pooglo.ads		20200228061810 ede33ef8 system.pool_global%s
+D s-secsta.ads		20200327060540 9b3ab94b system.secondary_stack%s
+D s-soflin.ads		20200228061810 a7318a92 system.soft_links%s
+D s-stache.ads		20200228061810 a37c21ec system.stack_checking%s
+D s-stausa.ads		20200228061810 017a0a05 system.stack_usage%s
+D s-stalib.ads		20200228061810 6b7a13f2 system.standard_library%s
+D s-stoele.ads		20200228061810 2dc34a04 system.storage_elements%s
+D s-stopoo.ads		20200313060448 e9fa2dd8 system.storage_pools%s
+D s-stposu.ads		20200317060516 e251976f system.storage_pools.subpools%s
+D s-stratt.ads		20200424050626 9a2744e9 system.stream_attributes%s
+D s-tasinf.ads		20200228061810 601f6b72 system.task_info%s
+D s-taspri.ads		20200228061810 6c1d93d4 system.task_primitives%s
+D s-taprop.ads		20200228061810 6eefbe12 system.task_primitives.operations%s
+D s-taskin.ads		20200228061810 88fba9ad system.tasking%s
+D s-taprob.ads		20200228061810 acd6094d system.tasking.protected_objects%s
+D s-tpoben.ads		20200228061810 60ad3dae system.tasking.protected_objects.entries%s
+D s-tasren.ads		20200228061810 a67a9949 system.tasking.rendezvous%s
+D s-tassta.ads		20200228061810 cca55c94 system.tasking.stages%s
+D s-traent.ads		20200228061810 005bf670 system.traceback_entries%s
+D s-unstyp.ads		20200319060540 5ecf7212 system.unsigned_types%s
+D s-wchcon.ads		20200228061810 1b7d22d2 system.wch_con%s
+D s-win32.ads		20200228061810 15ac53fb system.win32%s
+D test.adb		20210402145732 37e81196 test%b
+G a e
+G c Z b b [test standard 8 11 none]
+G r r none [test standard 8 11 none] [setup ib_ada__conn__socket_connection 6 13 none]
+G r c none [test standard 8 11 none] [handshake ib_ada__communication 56 14 none]
+G r c none [test standard 8 11 none] [start_api ib_ada__communication 57 14 none]
+G r c none [test standard 8 11 none] [open_orders ib_ada__communication 65 14 none]
+G r r none [test standard 8 11 none] [disconnect ib_ada__conn__socket_connection 7 13 none]
+X 1 ada.ads
+16K9*Ada 20e8 69|1r6 1r23
+X 13 a-iteint.ads
+24h9 Forward_Iterator
+32h9 Reversible_Iterator<24R9[9|111]>
+X 19 a-strunb.ads
+238V14*"="{boolean} 9|64i19
+X 22 a-textio.ads
+57K13*Text_IO 727e16 69|1w10 1r27
+X 27 ib_ada.ads
+11K9*ib_ada 228e11 69|3w6 4r6 5r6 14r4 14r29 16r4 17r4 25r4 36r4
+30n56*IB_PAPER{30E9} 69|14r36
+X 28 ib_ada-communication.ads
+7K16*communication 67e25 69|5w13 16r11 17r11 25r11
+56U14*handshake 69|16s25
+57U14*start_api 69|17s25
+65U14*open_orders 69|25s25
+X 29 ib_ada-conn.ads
+3K16*conn 13e16 69|4w13 14r11 36r11
+6Y13 setup 69|14s23
+7Y13 disconnect 69|36s23
+11t4*client{5T14} 69|14r16 36r16
+X 51 s-stausa.ads
+208U14*Initialize 209i<c,__gnat_stack_usage_initialize>22
+273U14*Output_Results 277i<c,__gnat_stack_usage_output_results>22
+X 69 test.adb
+8U11*test 8b11 38l5 38t9
+10i4 request_id{integer}
+

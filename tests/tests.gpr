@@ -1,0 +1,10 @@
+with "../ib_ada.gpr";
+
+project tests is
+   for Languages use ("Ada");
+   for Create_Missing_Dirs use "True";
+   for Object_Dir  use "build/obj";
+   for Exec_Dir use "bin";
+   for Source_Dirs use (".");
+   for Main use ("test.adb");
+end tests;
