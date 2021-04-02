@@ -1,1 +1,0 @@
-test.adb:10:04: warning: variable "request_id" is never read and never assigned
