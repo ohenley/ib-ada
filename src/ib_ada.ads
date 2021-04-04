@@ -27,13 +27,14 @@ package ib_ada is
    type currency_type is (USD, CAD, UNDEFINED);
    type trading_class_type is (NMS, SCM, UNDEFINED);
 
-   type session_type is (TWS_LIVE, TWS_PAPER, IB_LIVE, IB_PAPER);
+   type session_type is (TWS_LIVE, TWS_PAPER, IB_LIVE, IB_PAPER, UNDEFINED);
    type session_port_type is array (session_type) of GNAT.Sockets.port_type;
 
    ports : session_port_type := (TWS_LIVE  => 7496,
                                  TWS_PAPER => 7497,
                                  IB_LIVE   => 4001,
-                                 IB_PAPER  => 4002);
+                                 IB_PAPER  => 4002,
+                                 UNDEFINED => 0000);
 
    type contract_type is record
       contract_id : integer := 0;
@@ -165,7 +166,7 @@ package ib_ada is
 
    type position_type is record
       contract       : contract_type;
-      number         : integer := -1;
+      quantity         : integer := -1;
       average_cost   : safe_float := safe_float'last;
       pnl_unrealized : safe_float := safe_float'last;
       pnl_realized   : safe_float := safe_float'last;
@@ -192,6 +193,7 @@ package ib_ada is
                      UNDEFINED);
 
    function tag_image (tag : tag_type) return string;
+   function tag_value (tag : string) return tag_type;
 
    function prepare_contract (symbol : string; security : security_type; currency : currency_type; exchange : exchange_type) return contract_type;
    function prepare_order (action : order_action_type; quantity : integer; at_price_type : order_at_price_type; time_in_force : time_in_force_type := DAY; limit_price : safe_float := 0.0) return order_type;

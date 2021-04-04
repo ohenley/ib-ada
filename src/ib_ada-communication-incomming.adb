@@ -1,7 +1,6 @@
 with Ada.Text_IO; use Ada.Text_IO;
 With Ada.Text_IO.Unbounded_IO;
-with Ada.Characters.Handling, Ada.Text_IO;
-use  Ada.Characters.Handling, Ada.Text_IO;
+with Ada.Characters.Handling; use  Ada.Characters.Handling;
 
 with Ada.Strings.Fixed; use Ada.Strings.Fixed;
 
@@ -101,7 +100,7 @@ package body ib_ada.communication.incomming is
       contract.exchange := exchange_type'value (+msg_tokens (msg_tokens.first_index + 5));
       contract.currency := currency_type'value (+msg_tokens (msg_tokens.first_index + 6));
       position.contract := contract;
-      position.number := integer'value(+msg_tokens (msg_tokens.first_index + 9));
+      position.quantity := integer'value(+msg_tokens (msg_tokens.first_index + 9));
       position.average_cost := float'value(+msg_tokens (msg_tokens.first_index + 10));
       ib_ada.accounts(account).positions.include (contract.symbol, position);
 
@@ -118,9 +117,17 @@ package body ib_ada.communication.incomming is
 
    function handle_account_summary_msg (req : req_type; msg_tokens : in out msg_vector.vector; msg_handler : msg_handler_type) return resp_type is
       resp : resp_type;
+      account_id : unbounded_string := msg_tokens (msg_tokens.first_index + 1);
+      tag : tag_type := tag_value (+msg_tokens (msg_tokens.first_index + 2));
+      summary : summary_type;
    begin
       resp.and_listen := true;
       resp.resp_id := account_summary;
+
+      summary.value := safe_float'value(+msg_tokens (msg_tokens.first_index + 3));
+      summary.currency := currency_type'value (+msg_tokens (msg_tokens.first_index + 4));
+
+      ib_ada.accounts(account_id).summaries.include (tag, summary);
       return resp;
    end;
 

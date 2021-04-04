@@ -26,6 +26,20 @@ package body ib_ada is
       return +tag_image;
    end;
 
+   function tag_value (tag : string) return tag_type is
+      tag_image : unbounded_string;
+   begin
+      append (tag_image, to_upper (tag(tag'first)));
+      for i in tag'first + 1 .. tag'last loop
+         if is_upper(tag(i)) then
+            append (tag_image, "_");
+         end if;
+         append (tag_image, to_upper (tag(i)));
+      end loop;
+      return tag_type'value(+tag_image);
+   end;
+
+
    function prepare_contract (symbol : string; security : security_type; currency : currency_type; exchange : exchange_type) return contract_type is
       contract : contract_type;
    begin
