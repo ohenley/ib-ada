@@ -110,7 +110,7 @@ package body ib_ada.communication.outgoing is
       end if;
    end;
 
-   function "-" (field: order_action_type) return string is
+   function "-" (field: order_side_type) return string is
    begin
       if field = UNDEFINED then
          return -"";
@@ -314,7 +314,7 @@ package body ib_ada.communication.outgoing is
       security_id_type : string := -contract.security_id_type;
       security_id : string := -contract.security_id;
 
-      action : string := -order.action;
+      side : string := -order.side;
       quantity : string := -order.quantity;
       at_price_type : string := -order.at_price_type;
       limit_price : string := -order.limit_price;
@@ -438,7 +438,7 @@ package body ib_ada.communication.outgoing is
       trading_class &
       security_id_type &
       security_id &
-      action &
+      side &
       quantity &
       at_price_type &
       limit_price &

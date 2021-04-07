@@ -53,14 +53,40 @@ package ib_ada.communication is
          resp_id : resp_id_type;
       end record;
 
+
+   type cached_request_type is abstract tagged null record;
+
+   type pnl_cached_request_type is new cached_request_type with
+      record
+         account_id : unbounded_string;
+         contract_id : integer;
+      end record;
+
+   package cached_request_map is new indefinite_hashed_maps
+     (Key_Type        => string,
+      Element_Type    => cached_request_type'class,
+      Hash            => Ada.strings.hash,
+      Equivalent_Keys => "=");
+
+   protected cached_requests is
+      procedure cache_request (req_id : integer; req : cached_request_type'class);
+      procedure consume_request (req_id : integer; req : in out cached_request_type'class);
+
+      function length return count_type;
+   private
+      cached_requests : cached_request_map.map;
+   end;
+
    procedure handshake;
    procedure start_api;
    procedure account_summary (tag : tag_type);
    procedure positions;
    procedure pnl (account_id : string; contract_id : integer);
+   procedure pnls;
    function place_order (contract : contract_type; order : order_type) return integer;
-   function buy_order (symbol : string; quantity : integer; at_price_type : order_at_price_type) return integer;
-   function sell_order (symbol : string; quantity : integer; at_price_type : order_at_price_type) return integer;
+
+   function place_order (side: order_side_type; symbol : string; quantity : integer; at_price_type : order_at_price_type) return integer;
+
    procedure cancel_order (request_id : integer);
    procedure open_orders;
 

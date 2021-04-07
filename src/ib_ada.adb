@@ -50,29 +50,15 @@ package body ib_ada is
       return contract;
    end;
 
-   function prepare_order (action : order_action_type; quantity : integer; at_price_type : order_at_price_type; time_in_force : time_in_force_type := DAY; limit_price : safe_float := 0.0) return order_type is
+   function prepare_order (side : order_side_type; quantity : integer; at_price_type : order_at_price_type; time_in_force : time_in_force_type := DAY; limit_price : safe_float := 0.0) return order_type is
       order : order_type;
    begin
-      order.action := action;
+      order.side := side;
       order.quantity := quantity;
       order.at_price_type := at_price_type;
       order.time_in_force := time_in_force;
       order.limit_price := limit_price;
       return order;
    end;
-
-
---
---  public static Order PrepareOrder(ActionType action, OrderType orderType, int totalQuantity, double lmtPrice = 0.0)
---  {
---      Order order = new Order();
---      order.OutsideRth = true;
---      order.Action = action.ToString();
---      order.OrderType = orderType.ToString();
---      order.TotalQuantity = totalQuantity;
---      order.LmtPrice = lmtPrice;
---      order.OrderId = GetUniqueId();
---      return order;
---  }
 
 end ib_ada;

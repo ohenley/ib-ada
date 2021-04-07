@@ -57,7 +57,7 @@ package ib_ada is
 
    end record;
 
-   type order_action_type is (BUY, SELL, UNDEFINED);
+   type order_side_type is (BUY, SELL, UNDEFINED);
    type order_at_price_type is (MKT, MIDPRICE, UNDEFINED);
 
    type time_in_force_type is (DAY, GTC, IOC, GTD, OPG, FOK, DTC, UNDEFINED);
@@ -70,7 +70,7 @@ package ib_ada is
    type algo_strategy_type is (ARRIVAL_P_X, DARK_ICE, PCT_VOL, TWAP, VWAP, UNDEFINED);
 
    type order_type is record
-      action : order_action_type := UNDEFINED;
+      side : order_side_type := UNDEFINED;
       quantity : integer := 0;
       at_price_type : order_at_price_type := UNDEFINED;
       limit_price : safe_float := safe_float'last;
@@ -171,7 +171,7 @@ package ib_ada is
       pnl_unrealized : safe_float := safe_float'last;
       pnl_realized   : safe_float := safe_float'last;
       pnl_daily      : safe_float := safe_float'last;
-      value          : safe_float := safe_float'last;
+      open_value     : safe_float := safe_float'last;
    end record;
 
    package position_map is new indefinite_hashed_maps
@@ -196,7 +196,7 @@ package ib_ada is
    function tag_value (tag : string) return tag_type;
 
    function prepare_contract (symbol : string; security : security_type; currency : currency_type; exchange : exchange_type) return contract_type;
-   function prepare_order (action : order_action_type; quantity : integer; at_price_type : order_at_price_type; time_in_force : time_in_force_type := DAY; limit_price : safe_float := 0.0) return order_type;
+   function prepare_order (side : order_side_type; quantity : integer; at_price_type : order_at_price_type; time_in_force : time_in_force_type := DAY; limit_price : safe_float := 0.0) return order_type;
 
    type summary_type is record
       value : float := 0.0;

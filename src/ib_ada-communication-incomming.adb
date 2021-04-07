@@ -87,22 +87,31 @@ package body ib_ada.communication.incomming is
    end;
 
    function handle_position_msg (req : req_type; msg_tokens : in out msg_vector.vector; msg_handler : msg_handler_type) return resp_type is
-      account : unbounded_string := msg_tokens.first_element;
-      position : position_type;
-      contract : contract_type;
+
       resp : resp_type;
    begin
+
+      if req.req_id = positions then
+         declare
+            account : unbounded_string := msg_tokens.first_element;
+            position : position_type;
+            contract : contract_type;
+         begin
+            contract.contract_id := integer'value(+msg_tokens (msg_tokens.first_index + 1));
+            contract.symbol := msg_tokens (msg_tokens.first_index + 2);
+            contract.security := security_type'value (+msg_tokens (msg_tokens.first_index + 3));
+            contract.exchange := exchange_type'value (+msg_tokens (msg_tokens.first_index + 5));
+            contract.currency := currency_type'value (+msg_tokens (msg_tokens.first_index + 6));
+            position.contract := contract;
+            position.quantity := integer'value(+msg_tokens (msg_tokens.first_index + 9));
+            position.average_cost := float'value(+msg_tokens (msg_tokens.first_index + 10));
+            ib_ada.accounts(account).positions.include (contract.symbol, position);
+         end;
+
+      end if;
+
       resp.and_listen := true;
       resp.resp_id := positions;
-      contract.contract_id := integer'value(+msg_tokens (msg_tokens.first_index + 1));
-      contract.symbol := msg_tokens (msg_tokens.first_index + 2);
-      contract.security := security_type'value (+msg_tokens (msg_tokens.first_index + 3));
-      contract.exchange := exchange_type'value (+msg_tokens (msg_tokens.first_index + 5));
-      contract.currency := currency_type'value (+msg_tokens (msg_tokens.first_index + 6));
-      position.contract := contract;
-      position.quantity := integer'value(+msg_tokens (msg_tokens.first_index + 9));
-      position.average_cost := float'value(+msg_tokens (msg_tokens.first_index + 10));
-      ib_ada.accounts(account).positions.include (contract.symbol, position);
 
       return resp;
    end;
@@ -152,14 +161,31 @@ package body ib_ada.communication.incomming is
 
       resp : resp_type;
       request_id : integer := integer'value(+msg_tokens (msg_tokens.first_index));
-      number : integer := integer'value(+msg_tokens (msg_tokens.first_index + 1));
+      --quantity : integer := integer'value(+msg_tokens (msg_tokens.first_index + 1));
 
       pnl_daily : safe_float := get_safe_float(+msg_tokens (msg_tokens.first_index + 2));
       pnl_unrealized : safe_float := get_safe_float(+msg_tokens (msg_tokens.first_index + 3));
       pnl_realized : safe_float := get_safe_float(+msg_tokens (msg_tokens.first_index + 4));
-      value : safe_float := get_safe_float(+msg_tokens (msg_tokens.first_index + 5));
+      --current_value : safe_float := get_safe_float(+msg_tokens (msg_tokens.first_index + 5));
 
+      cache_request : pnl_cached_request_type;
+      account_id : unbounded_string;
    begin
+      cached_requests.consume_request (request_id, cache_request);
+
+      for account in accounts.iterate loop
+         account_id := account_map.key(account);
+         if +account_id = cache_request.account_id then
+            for pos in accounts(account_id).positions.iterate loop
+               if position_map.Element(pos).contract.contract_id = cache_request.contract_id then
+                  accounts(account_id).positions(pos).pnl_daily := pnl_daily;
+                  accounts(account_id).positions(pos).pnl_unrealized := pnl_unrealized;
+                  accounts(account_id).positions(pos).pnl_realized := pnl_realized;
+               end if;
+            end loop;
+         end if;
+      end loop;
+
       resp.and_listen := false;
       resp.resp_id := pnl_single;
       return resp;
