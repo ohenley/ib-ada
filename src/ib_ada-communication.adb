@@ -54,7 +54,7 @@ package body ib_ada.communication is
 
    procedure handshake is
       use ib_ada.communication.outgoing;
-      handshake_msg : req_type := (+build_handshake_msg, true, handshake);
+      handshake_msg : req_type := (-1, +build_handshake_msg, true, handshake);
       resp : resp_type;
    begin
       ib_ada.conn.client.send (handshake_msg, resp);
@@ -62,7 +62,7 @@ package body ib_ada.communication is
 
    procedure start_api is
       use ib_ada.communication.outgoing;
-      start_api_msg : req_type := (+build_start_api_msg, true, start_api);
+      start_api_msg : req_type := (-1, +build_start_api_msg, true, start_api);
       resp : resp_type;
    begin
       ib_ada.conn.client.send (start_api_msg, resp);
@@ -70,7 +70,7 @@ package body ib_ada.communication is
 
    procedure account_summary (tag : tag_type) is
       use ib_ada.communication.outgoing;
-      account_summary_msg : req_type := (+build_account_summary_msg (tag), true, account_summary);
+      account_summary_msg : req_type := (-1, +build_account_summary_msg (tag), true, account_summary);
       resp : resp_type;
    begin
       ib_ada.conn.client.send (account_summary_msg, resp);
@@ -78,23 +78,32 @@ package body ib_ada.communication is
 
    procedure positions is
       use ib_ada.communication.outgoing;
-      positions_msg : req_type := (+build_positions_msg, true, positions);
+      positions_msg : req_type := (-1, +build_positions_msg, true, positions);
       resp : resp_type;
+      account_id : unbounded_string;
    begin
+      for account in accounts.iterate loop
+         account_id := account_map.key(account);
+         accounts(account_id).positions.clear;
+         accounts(account_id).open_orders.clear;
+         accounts(account_id).summaries.clear;
+      end loop;
+
       ib_ada.conn.client.send (positions_msg, resp);
    end;
 
    procedure pnl (account_id : string; contract_id : integer) is
       use ib_ada.communication.outgoing;
-      req_id : integer := unique_id.get_unique_id (next_valid_request_id);
-      pnl_msg : req_type := (+build_pnl_msg (req_id, account_id, contract_id), true, pnl_single);
-      cancel_pnl : req_type := (+build_cancel_pnl_msg (req_id), false, pnl_cancel_single);
+      request_number : integer := unique_id.get_unique_id (next_valid_request_id);
+      pnl_msg : req_type := (request_number, +build_pnl_msg (request_number, account_id, contract_id), true, pnl_single);
+      cancel_pnl : req_type := (request_number, +build_cancel_pnl_msg (request_number), false, pnl_cancel_single);
       resp : resp_type;
       cache_request : pnl_cached_request_type;
    begin
       cache_request.account_id := +account_id;
       cache_request.contract_id := contract_id;
-      cached_requests.cache_request (req_id, cache_request);
+      cached_requests.cache_request (request_number, cache_request);
+
       ib_ada.conn.client.send (pnl_msg, resp);
 
       if resp.resp_id /= error then
@@ -132,12 +141,19 @@ package body ib_ada.communication is
 
    function place_order (contract : contract_type; order : order_type) return integer is
       use ib_ada.communication.outgoing;
-      req_id : integer := unique_id.get_unique_id (next_valid_request_id);
-      place_order_msg : req_type := (+build_place_order_msg (req_id, contract, order), true, place_order);
+      request_number : integer := unique_id.get_unique_id (next_valid_request_id);
+      place_order_msg : req_type;
+      req_id : req_id_type;
       resp : resp_type;
    begin
+      if order.what_if then
+         req_id := fake_order;
+      else
+         req_id := place_order;
+      end if;
+      place_order_msg := (request_number, +build_place_order_msg (request_number, contract, order), true, req_id);
       ib_ada.conn.client.send (place_order_msg, resp);
-      return req_id;
+      return request_number;
    end;
 
    function place_order (side: order_side_type; symbol : string; quantity : integer; at_price_type : order_at_price_type) return integer is
@@ -145,17 +161,33 @@ package body ib_ada.communication is
                                                                   security => ib_ada.STK,
                                                                   currency => ib_ada.USD,
                                                                   exchange => ib_ada.SMART);
-      order : ib_ada.order_type := ib_ada.prepare_order (side      => side,
-                                                         quantity    => quantity,
+      order : ib_ada.order_type := ib_ada.prepare_order (side           => side,
+                                                         quantity       => quantity,
                                                          at_price_type  => at_price_type);
-      req_id : integer := ib_ada.communication.place_order (contract, order);
+      request_number : integer := ib_ada.communication.place_order (contract, order);
    begin
-      return req_id;
+      return request_number;
    end;
 
-   procedure cancel_order (request_id : integer) is
+   function place_fake_order (side: order_side_type; symbol : string; quantity : integer; at_price_type : order_at_price_type) return integer is
+      contract : ib_ada.contract_type := ib_ada.prepare_contract (symbol   => symbol,
+                                                                  security => ib_ada.STK,
+                                                                  currency => ib_ada.USD,
+                                                                  exchange => ib_ada.SMART);
+      order : ib_ada.order_type := ib_ada.prepare_order (side           => side,
+                                                         quantity       => quantity,
+                                                         at_price_type  => at_price_type,
+                                                         what_if        => true);
+      request_number : integer := ib_ada.communication.place_order (contract, order);
+      --cache_request : commission_cached_request_type;
+   begin
+      --cached_requests.cache_request (request_number, cache_request);
+      return request_number;
+   end;
+
+   procedure cancel_order (request_number : integer) is
       use ib_ada.communication.outgoing;
-      cancel_order_msg : req_type := (+build_cancel_order_msg (request_id), true, cancel_order);
+      cancel_order_msg : req_type := (request_number, +build_cancel_order_msg (request_number), true, cancel_order);
       resp : resp_type;
    begin
       ib_ada.conn.client.send (cancel_order_msg, resp);
@@ -163,10 +195,45 @@ package body ib_ada.communication is
 
    procedure open_orders is
       use ib_ada.communication.outgoing;
-      open_orders_msg : req_type := (+build_open_orders_msg, true, open_orders);
+      open_orders_msg : req_type := (-1, +build_open_orders_msg, true, open_orders);
+      resp : resp_type;
+      account_id : unbounded_string;
+   begin
+
+      for account in accounts.iterate loop
+         account_id := account_map.key(account);
+         accounts(account_id).positions.clear;
+         accounts(account_id).open_orders.clear;
+         accounts(account_id).summaries.clear;
+      end loop;
+
+      ib_ada.conn.client.send (open_orders_msg, resp);
+   end;
+
+   procedure market_data (symbol : string; contract_id : integer) is
+      use ib_ada.communication.outgoing;
+      request_number : integer := unique_id.get_unique_id (next_valid_request_id);
+      contract : contract_type;
       resp : resp_type;
    begin
-      ib_ada.conn.client.send (open_orders_msg, resp);
+      contract.contract_id := contract_id;
+      contract.symbol := +symbol;
+      contract.security := STK;
+      contract.exchange := SMART;
+      contract.currency := USD;
+      declare
+         market_data_msg : req_type := (request_number, +build_market_data_msg (request_number, contract), true, market_data);
+      begin
+         ib_ada.conn.client.send (market_data_msg, resp);
+      end;
+
+   end;
+
+   function get_commission (request_number : integer) return safe_float is
+      cache_request : commission_cached_request_type;
+   begin
+      cached_requests.consume_request (request_number, cache_request);
+      return cache_request.commission;
    end;
 
 

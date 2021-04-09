@@ -19,6 +19,15 @@ package body ib_ada.communication.incomming is
       new_line;
    end;
 
+   function get_safe_float (token : string) return safe_float is
+      value : float := float'value(token);
+   begin
+      if value'valid then
+         return value;
+      end if;
+      return safe_float'last;
+   end;
+
    procedure filter_codes (msg_tokens : in out msg_vector.vector; codes : code_vector.vector) is
       i : msg_vector.extended_index;
    begin
@@ -78,7 +87,7 @@ package body ib_ada.communication.incomming is
       elsif req.req_id = cancel_order then
          resp.and_listen := false;
       else
-         resp.and_listen := false;
+         resp.and_listen := true;
       end if;
 
       resp.resp_id := error;
@@ -87,25 +96,27 @@ package body ib_ada.communication.incomming is
    end;
 
    function handle_position_msg (req : req_type; msg_tokens : in out msg_vector.vector; msg_handler : msg_handler_type) return resp_type is
-
       resp : resp_type;
    begin
 
       if req.req_id = positions then
          declare
             account : unbounded_string := msg_tokens.first_element;
+            quantity : integer := integer'value(+msg_tokens (msg_tokens.first_index + 9));
             position : position_type;
             contract : contract_type;
          begin
-            contract.contract_id := integer'value(+msg_tokens (msg_tokens.first_index + 1));
-            contract.symbol := msg_tokens (msg_tokens.first_index + 2);
-            contract.security := security_type'value (+msg_tokens (msg_tokens.first_index + 3));
-            contract.exchange := exchange_type'value (+msg_tokens (msg_tokens.first_index + 5));
-            contract.currency := currency_type'value (+msg_tokens (msg_tokens.first_index + 6));
-            position.contract := contract;
-            position.quantity := integer'value(+msg_tokens (msg_tokens.first_index + 9));
-            position.average_cost := float'value(+msg_tokens (msg_tokens.first_index + 10));
-            ib_ada.accounts(account).positions.include (contract.symbol, position);
+            if quantity > 0 then
+               contract.contract_id := integer'value(+msg_tokens (msg_tokens.first_index + 1));
+               contract.symbol := msg_tokens (msg_tokens.first_index + 2);
+               contract.security := security_type'value (+msg_tokens (msg_tokens.first_index + 3));
+               contract.exchange := exchange_type'value (+msg_tokens (msg_tokens.first_index + 5));
+               contract.currency := currency_type'value (+msg_tokens (msg_tokens.first_index + 6));
+               position.contract := contract;
+               position.quantity := quantity;
+               position.average_cost := float'value(+msg_tokens (msg_tokens.first_index + 10));
+               ib_ada.accounts(account).positions.include (contract.symbol, position);
+            end if;
          end;
 
       end if;
@@ -149,18 +160,8 @@ package body ib_ada.communication.incomming is
    end;
 
    function handle_pnl_single_msg (req : req_type; msg_tokens : in out msg_vector.vector; msg_handler : msg_handler_type) return resp_type is
-
-      function get_safe_float (token : string) return safe_float is
-         value : float := float'value(token);
-      begin
-         if value'valid then
-            return value;
-         end if;
-         return safe_float'last;
-      end;
-
       resp : resp_type;
-      request_id : integer := integer'value(+msg_tokens (msg_tokens.first_index));
+      request_number : integer := integer'value(+msg_tokens (msg_tokens.first_index));
       --quantity : integer := integer'value(+msg_tokens (msg_tokens.first_index + 1));
 
       pnl_daily : safe_float := get_safe_float(+msg_tokens (msg_tokens.first_index + 2));
@@ -171,7 +172,7 @@ package body ib_ada.communication.incomming is
       cache_request : pnl_cached_request_type;
       account_id : unbounded_string;
    begin
-      cached_requests.consume_request (request_id, cache_request);
+      cached_requests.consume_request (request_number, cache_request);
 
       for account in accounts.iterate loop
          account_id := account_map.key(account);
@@ -201,21 +202,104 @@ package body ib_ada.communication.incomming is
 
    function handle_open_order_msg (req : req_type; msg_tokens : in out msg_vector.vector; msg_handler : msg_handler_type) return resp_type is
       resp : resp_type;
+      request_number : integer := integer'value(+msg_tokens (msg_tokens.first_index));
    begin
       resp.and_listen := true;
-      resp.resp_id := open_order;
+
+      if req.req_id = open_orders then
+         resp.resp_id := open_order;
+      elsif req.req_id = fake_order then
+         resp.resp_id := fake_order;
+      end if;
+
+      if request_number /= req.request_number then
+         return resp;
+      end if;
+
+      if req.req_id = open_orders then
+         declare
+            account_id : unbounded_string := msg_tokens (msg_tokens.first_index + 16);
+            symbol : unbounded_string := msg_tokens (msg_tokens.first_index + 2);
+            open_ord : open_order_type;
+         begin
+            open_ord.request_id := request_number;
+            --open_ord.status := order_status_value(+msg_tokens (msg_tokens.first_index + 52));
+            --
+            open_ord.contract.contract_id := integer'value(+msg_tokens (msg_tokens.first_index + 1));
+            open_ord.contract.symbol := symbol;
+            open_ord.contract.security := security_type'value (+msg_tokens (msg_tokens.first_index + 3));
+            open_ord.contract.exchange := exchange_type'value (+msg_tokens (msg_tokens.first_index + 6));
+            open_ord.contract.currency := currency_type'value (+msg_tokens (msg_tokens.first_index + 7));
+
+            open_ord.order.side := order_side_type'value(+msg_tokens (msg_tokens.first_index + 10));
+            open_ord.order.quantity :=  integer'value(+msg_tokens (msg_tokens.first_index + 11));
+            open_ord.order.at_price_type :=  order_at_price_type'value(+msg_tokens (msg_tokens.first_index + 12));
+            open_ord.order.time_in_force := time_in_force_type'value(+msg_tokens (msg_tokens.first_index + 15));
+
+            ib_ada.accounts(account_id).open_orders.include (symbol, open_ord);
+         end;
+      elsif req.req_id = fake_order then
+
+
+
+
+
+         declare
+            counter : integer := 0;
+            cache_request : commission_cached_request_type;
+         begin
+
+            for token of msg_tokens loop
+               Put_Line (+token & " : " & counter'image);
+               counter := counter + 1;
+            end loop;
+
+
+            cache_request.commission := -1.0 * safe_float'value(+msg_tokens (msg_tokens.first_index + 58));
+            cached_requests.cache_request (request_number, cache_request);
+         end;
+
+         put_line ("received fake_order results");
+         resp.and_listen := false;
+      end if;
+
+      return resp;
+   end;
+
+   function handle_fake_order_msg (req : req_type; msg_tokens : in out msg_vector.vector; msg_handler : msg_handler_type) return resp_type is
+      resp : resp_type;
+      request_number : integer := integer'value(+msg_tokens (msg_tokens.first_index));
+   begin
+      resp.resp_id := fake_order;
+      resp.and_listen := true;
+
+      if request_number /= req.request_number then
+         return resp;
+      end if;
+
+      if req.req_id = fake_order then
+         put_line ("received fake_order results");
+      end if;
+      resp.and_listen := false;
+
       return resp;
    end;
 
    function handle_order_status_msg (req : req_type; msg_tokens : in out msg_vector.vector; msg_handler : msg_handler_type) return resp_type is
       resp : resp_type;
+      request_number : integer := integer'value(+msg_tokens (msg_tokens.first_index));
    begin
+      resp.resp_id := order_status;
+      resp.and_listen := true;
+
+      if request_number /= req.request_number then
+         return resp;
+      end if;
+
       if req.req_id = place_order then
          resp.and_listen := false;
-      else
-         resp.and_listen := true;
       end if;
-      resp.resp_id := order_status;
+
       return resp;
    end;
 
@@ -262,11 +346,15 @@ package body ib_ada.communication.incomming is
       message_tokens : msg_vector.vector := parse_message (msg);
       raw_message : string := +msg;
       resp : resp_type;
+
+      message_code : string := +message_tokens.first_element;
    begin
       -- patching ill formed protocol
       if req.req_id = handshake then
          message_tokens.prepend(+"0");
       end if;
+
+      Put_Line("<-------- " & message_code & " -------->");
 
       if msg_definitions.contains (message_tokens.first_element) then
          declare
@@ -278,6 +366,11 @@ package body ib_ada.communication.incomming is
             print_msg_tokens (message_tokens);
             resp := msg_handler.handling_func.all (req, message_tokens, msg_handler);
          end;
+      else
+         put ("<undefined>");
+         print_msg_tokens (message_tokens);
+         resp.and_listen := true;
+         resp.resp_id := undefined;
       end if;
       return resp;
    end;

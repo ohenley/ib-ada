@@ -59,6 +59,10 @@ package ib_ada is
 
    type order_side_type is (BUY, SELL, UNDEFINED);
    type order_at_price_type is (MKT, MIDPRICE, UNDEFINED);
+   type order_status_type is (PENDING_SUBMIT, PENDING_CANCEL, PRE_SUBMITTED, SUBMITTED, API_CANCELLED, CANCELLED, FILLED, INACTIVE, UNDEFINED);
+
+   function order_status_image (order_status : order_status_type) return string;
+   function order_status_value (order_status : string) return order_status_type;
 
    type time_in_force_type is (DAY, GTC, IOC, GTD, OPG, FOK, DTC, UNDEFINED);
    type open_close_type is (O, C, UNDEFINED);
@@ -164,6 +168,21 @@ package ib_ada is
       use_price_management_algo : boolean := true;
    end record;
 
+   type open_order_type is
+      record
+         order : order_type;
+         contract : contract_type;
+         request_id : integer;
+         --status : order_status_type := UNDEFINED;
+      end record;
+
+   package open_order_map is new indefinite_hashed_maps
+       (Key_Type        => unbounded_string,
+        Element_Type    => open_order_type,
+        Hash            => Ada.Strings.Unbounded.Hash,
+        Equivalent_Keys => "=");
+
+
    type position_type is record
       contract       : contract_type;
       quantity         : integer := -1;
@@ -196,7 +215,11 @@ package ib_ada is
    function tag_value (tag : string) return tag_type;
 
    function prepare_contract (symbol : string; security : security_type; currency : currency_type; exchange : exchange_type) return contract_type;
-   function prepare_order (side : order_side_type; quantity : integer; at_price_type : order_at_price_type; time_in_force : time_in_force_type := DAY; limit_price : safe_float := 0.0) return order_type;
+   function prepare_order (side : order_side_type; quantity : integer;
+                           at_price_type : order_at_price_type;
+                           time_in_force : time_in_force_type := DAY;
+                           limit_price : safe_float := 0.0;
+                           what_if : boolean := false) return order_type;
 
    type summary_type is record
       value : float := 0.0;
@@ -213,6 +236,7 @@ package ib_ada is
         Equivalent_Keys => "=");
 
    type act_type is record
+      open_orders : open_order_map.map;
       positions : position_map.map;
       summaries : summary_map.map;
    end record;

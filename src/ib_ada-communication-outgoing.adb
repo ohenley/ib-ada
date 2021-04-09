@@ -554,7 +554,64 @@ package body ib_ada.communication.outgoing is
       return open_orders_msg;
    end;
 
+   -- unfinished because cannot test, because I am not subscribed. :facepalm:
+   -- do you think binance requires subscriptions for market data ..?
+   function build_market_data_msg (request_id : integer; contract : contract_type) return string is
+      market_data : string := -"1";
+      version : string := -"11";
+      req_id : string := -request_id;
 
+      contract_id : string := -contract.contract_id;
+      symbol : string := -contract.symbol;
+      security : string := -contract.security;
+      last_trade_date_or_contract_month : string := -contract.last_trade_date_or_contract_month;
+      strike : string := -contract.strike;
+      right : string := -contract.right;
+      multiplier : string := -contract.multiplier;
+      exchange : string := -contract.exchange;
+      primary_exchange : string := -contract.primary_exchange;
+      currency : string := -contract.currency;
+      local_symbol : string := -contract.local_symbol;
+      trading_class : string := -contract.trading_class;
 
+      delta_neutral_contract : string := -false;
+
+      generic_tick_list : string := -"";
+      snapshot : string := -false;
+      regulatory_snapshot : string := -false;
+      market_data_options : string := -"";
+
+      market_data_msg : string := get_serialized_msg (
+      market_data &
+      version &
+      req_id &
+      contract_id &
+      symbol &
+      security &
+      last_trade_date_or_contract_month &
+      strike &
+      right &
+      multiplier &
+      exchange &
+      primary_exchange &
+      currency &
+      local_symbol &
+      trading_class &
+      delta_neutral_contract &
+      generic_tick_list &
+      snapshot &
+      regulatory_snapshot &
+      market_data_options);
+   begin
+      return market_data_msg;
+   end;
+
+   -- unfinished because cannot test, because ...
+   -- I am not subscribed for properly receiving from build_market_data_msg
+   function build_cancel_market_data_msg return string is
+      cancel_market_data : string := -"2";
+   begin
+      return "";
+   end;
 
 end ib_ada.communication.outgoing;
