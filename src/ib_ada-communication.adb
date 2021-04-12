@@ -7,7 +7,10 @@ with Ada.Strings.Fixed; use Ada.Strings.Fixed;
 with ib_ada.communication.outgoing;
 with ib_ada.conn;
 
+
+
 package body ib_ada.communication is
+
 
    protected body cached_requests is
       procedure cache_request (req_id : integer; req : cached_request_type'class) is
@@ -68,9 +71,9 @@ package body ib_ada.communication is
       ib_ada.conn.client.send (start_api_msg, resp);
    end;
 
-   procedure account_summary (tag : tag_type) is
+   procedure accounts_summary (tag : tag_type) is
       use ib_ada.communication.outgoing;
-      account_summary_msg : req_type := (-1, +build_account_summary_msg (tag), true, account_summary);
+      account_summary_msg : req_type := (-1, +build_accounts_summary_msg (tag), true, account_summary);
       resp : resp_type;
    begin
       ib_ada.conn.client.send (account_summary_msg, resp);

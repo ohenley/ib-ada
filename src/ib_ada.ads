@@ -10,6 +10,8 @@ with Ada.Strings.Hash;
 
 package ib_ada is
 
+   pragma Elaborate_Body;
+
    subtype safe_float is float range float'range;
 
    function "+" (value : unbounded_string) return string is

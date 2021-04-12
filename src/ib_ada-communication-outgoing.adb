@@ -263,7 +263,7 @@ package body ib_ada.communication.outgoing is
       return positions_msg;
    end;
 
-   function build_account_summary_msg (account_tag : tag_type) return string is
+   function build_accounts_summary_msg (account_tag : tag_type) return string is
       request_account_summary : string := -"62";
       code_1 : string := -"1";
       request_id : string := -unique_id.get_unique_id (next_valid_request_id);

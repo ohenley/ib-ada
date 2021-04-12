@@ -90,7 +90,7 @@ package ib_ada.communication is
 
    procedure handshake;
    procedure start_api;
-   procedure account_summary (tag : tag_type);
+   procedure accounts_summary (tag : tag_type);
    procedure positions;
    procedure pnl (account_id : string; contract_id : integer);
    procedure pnls;

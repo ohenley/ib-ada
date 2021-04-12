@@ -4,7 +4,7 @@ with Ada.Characters.Handling; use  Ada.Characters.Handling;
 
 with Ada.Strings.Fixed; use Ada.Strings.Fixed;
 
-with ib_ada.communication.outgoing; use ib_ada.communication.outgoing;
+with ib_ada.communication.outgoing; --use ib_ada.communication.outgoing;
 
 
 package body ib_ada.communication.incomming is
@@ -82,8 +82,17 @@ package body ib_ada.communication.incomming is
          end if;
       elsif req.req_id = pnl_single then
          resp.and_listen := true;
-      elsif req.req_id = place_order then
-         resp.and_listen := true;
+      elsif req.req_id = place_order or req.req_id = fake_order then
+         declare
+            error : integer := integer'value(+msg_tokens (msg_tokens.first_index + 1));
+         begin
+            Put_Line(error'image);
+            if error = 200 or error = 412 then -- (200) symbol does not exists, (412) contract is not available for trading
+               resp.and_listen := false;
+            else
+               resp.and_listen := true;
+            end if;
+         end;
       elsif req.req_id = cancel_order then
          resp.and_listen := false;
       else
@@ -204,6 +213,9 @@ package body ib_ada.communication.incomming is
       resp : resp_type;
       request_number : integer := integer'value(+msg_tokens (msg_tokens.first_index));
    begin
+
+      Put_Line(request_number'image);
+
       resp.and_listen := true;
 
       if req.req_id = open_orders then
@@ -212,9 +224,9 @@ package body ib_ada.communication.incomming is
          resp.resp_id := fake_order;
       end if;
 
-      if request_number /= req.request_number then
-         return resp;
-      end if;
+      --if request_number /= req.request_number then
+      --   return resp;
+      --end if;
 
       if req.req_id = open_orders then
          declare
@@ -238,28 +250,16 @@ package body ib_ada.communication.incomming is
 
             ib_ada.accounts(account_id).open_orders.include (symbol, open_ord);
          end;
-      elsif req.req_id = fake_order then
-
-
-
-
+      elsif req.req_id = fake_order and request_number = req.request_number then
 
          declare
             counter : integer := 0;
             cache_request : commission_cached_request_type;
          begin
-
-            for token of msg_tokens loop
-               Put_Line (+token & " : " & counter'image);
-               counter := counter + 1;
-            end loop;
-
-
             cache_request.commission := -1.0 * safe_float'value(+msg_tokens (msg_tokens.first_index + 58));
             cached_requests.cache_request (request_number, cache_request);
          end;
 
-         put_line ("received fake_order results");
          resp.and_listen := false;
       end if;
 
@@ -391,3 +391,12 @@ begin
    msg_definitions.include (+"53", (open_orders_end, codes((1 => 53)), handle_open_orders_end_msg'access));
 
 end ib_ada.communication.incomming;
+
+
+
+--              for token of msg_tokens loop
+--                 Put_Line (+token & " : " & counter'image);
+--                 counter := counter + 1;
+--              end loop;
+
+
