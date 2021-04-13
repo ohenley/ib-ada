@@ -36,6 +36,9 @@ package body ib_ada.conn is
             accept setup (session : session_type) do
                GNAT.Sockets.Initialize;
                Create_Socket (Client);
+
+               set_socket_option (client, socket_level, (reuse_address, true));
+
                Address.Addr := Inet_Addr ("127.0.0.1");
                Address.Port := ports (session);
 
