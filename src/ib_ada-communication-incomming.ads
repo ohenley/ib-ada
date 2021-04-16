@@ -20,11 +20,15 @@ use ada.containers;
 
 package ib_ada.communication.incomming is
 
+   package msg_vector is new vectors(index_type => natural, element_type => unbounded_string);
+
    type msg_handler_type;
 
    type handling_func_type is access function (req         : req_type;
                                                msg_tokens  : in out msg_vector.vector;
                                                msg_handler : msg_handler_type) return resp_type;
+
+   package code_vector is new vectors(index_type => natural, element_type => integer);
 
    type msg_handler_type is record
       resp_id       : resp_id_type;

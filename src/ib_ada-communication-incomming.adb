@@ -404,6 +404,17 @@ package body ib_ada.communication.incomming is
       return resp;
    end;
 
+   type variadic_integer_array is array(positive range <>) of integer;
+
+   function codes (elements: variadic_integer_array) return code_vector.vector is
+      codes : code_vector.vector;
+   begin
+      for i in elements'range loop
+         codes.append(elements(i));
+      end loop;
+      return codes;
+   end;
+
 begin
 
    msg_definitions.include(+"0",  (server_infos,           codes((1 => 0)),                  handle_session_datetime_msg'access));

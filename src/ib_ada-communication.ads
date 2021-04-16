@@ -21,13 +21,6 @@ use ada.containers;
 
 package ib_ada.communication is
 
-   package code_vector is new vectors(index_type => natural, element_type => integer);
-   type variadic_integer_array is array(positive range <>) of integer;
-   package msg_vector is new vectors(index_type => natural, element_type => unbounded_string);
-
-   function codes (elements: variadic_integer_array) return code_vector.vector;
-   function get_serialized_msg (msg : string) return string;
-
    type req_id_type is
      (handshake,
       start_api,

@@ -50,24 +50,14 @@ package body ib_ada.communication is
       end;
    end;
 
-   function codes (elements: variadic_integer_array) return code_vector.vector is
-      codes : code_vector.vector;
-   begin
-      for i in elements'range loop
-         codes.append(elements(i));
-      end loop;
-      return codes;
-   end;
-
-   function get_serialized_msg (msg : string) return string is
-      header : string(1..4);
-   begin
-      for i in header'first .. header'last-1 loop
-         header(i) := ascii.nul;
-      end loop;
-      header(header'last) := character'val(msg'length);
-      return header & msg;
-   end;
+--     function codes (elements: variadic_integer_array) return code_vector.vector is
+--        codes : code_vector.vector;
+--     begin
+--        for i in elements'range loop
+--           codes.append(elements(i));
+--        end loop;
+--        return codes;
+--     end;
 
    procedure clear_accounts_content is
       account_id : unbounded_string;

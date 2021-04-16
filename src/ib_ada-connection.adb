@@ -85,7 +85,7 @@ package body ib_ada.connection is
                            msg_length := to_length (msg_header_swap);
                            declare
                               msg_buffer     : stream_element_array (1 .. ada.streams.stream_element_offset(msg_length));
-                              message_tokens : msg_vector.vector;
+                              message_tokens : ib_ada.communication.incomming.msg_vector.vector;
                               server_msg     : unbounded_string;
                            begin
                               ada.streams.read (channel.all, msg_buffer, offset); -- read message

@@ -197,6 +197,16 @@ package body ib_ada.communication.outgoing is
       end if;
    end;
 
+   function get_serialized_msg (msg : string) return string is
+      header : string(1..4);
+   begin
+      for i in header'first .. header'last-1 loop
+         header(i) := ascii.nul;
+      end loop;
+      header(header'last) := character'val(msg'length);
+      return header & msg;
+   end;
+
    package integer_io is new ada.direct_io(integer);
 
    protected body unique_id is
