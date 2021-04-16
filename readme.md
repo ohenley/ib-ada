@@ -47,7 +47,7 @@ Interactive Brokers (IB) TWS/IB Gateway communication engine written in Ada.
 - Install [GNAT community 2020](https://community.download.adacore.com/v1/966801764ae160828c97d2c33000e9feb08d4cce?filename=gnat-2020-20200429-x86_64-windows-bin.exe)
 ```
 $ git clone https://github.com/ohenley/ib-ada.git    
-$ cd ib_ada
+$ cd ib-ada
 $ gprbuild ib_ada.gpr
 ```
    
@@ -55,7 +55,7 @@ $ gprbuild ib_ada.gpr
 ```
 $ sudo apt-get install gnat-gps
 $ git clone https://github.com/ohenley/ib-ada.git
-$ cd ib_ada
+$ cd ib-ada
 $ gprbuild ib_ada.gpr
 ```
 
