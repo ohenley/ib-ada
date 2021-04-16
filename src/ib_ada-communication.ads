@@ -1,17 +1,16 @@
 
-with Ada.Containers.Vectors;
-with Ada.Calendar;
+with ada.containers.vectors;
+with ada.calendar;
 
-use Ada.Containers;
+use ada.containers;
 
 package ib_ada.communication is
 
-   package code_vector is new vectors(Index_Type => natural, element_type => integer);
+   package code_vector is new vectors(index_type => natural, element_type => integer);
    type variadic_integer_array is array(positive range <>) of integer;
+   package msg_vector is new vectors(index_type => natural, element_type => unbounded_string);
+
    function codes (elements: variadic_integer_array) return code_vector.vector;
-
-   package msg_vector is new vectors(Index_Type => natural, element_type => unbounded_string);
-
    function get_serialized_msg (msg : string) return string;
 
    type req_id_type is
@@ -32,9 +31,9 @@ package ib_ada.communication is
    type req_type is
       record
          request_number : integer := -1;
-         msg : unbounded_string := +"";
-         and_listen : boolean;
-         req_id : req_id_type;
+         msg            : unbounded_string := +"";
+         and_listen     : boolean;
+         req_id         : req_id_type;
       end record;
 
    type resp_id_type is
@@ -57,7 +56,7 @@ package ib_ada.communication is
    type resp_type is
       record
          and_listen : boolean;
-         resp_id : resp_id_type;
+         resp_id    : resp_id_type;
       end record;
 
 
@@ -65,7 +64,7 @@ package ib_ada.communication is
 
    type pnl_cached_request_type is new cached_request_type with
       record
-         account_id : unbounded_string;
+         account_id  : unbounded_string;
          contract_id : integer;
       end record;
 
@@ -75,15 +74,14 @@ package ib_ada.communication is
       end record;
 
    package cached_request_map is new indefinite_hashed_maps
-     (Key_Type        => string,
-      Element_Type    => cached_request_type'class,
-      Hash            => Ada.strings.hash,
-      Equivalent_Keys => "=");
+     (key_type        => string,
+      element_type    => cached_request_type'class,
+      hash            => ada.strings.hash,
+      equivalent_keys => "=");
 
    protected cached_requests is
       procedure cache_request (req_id : integer; req : cached_request_type'class);
       procedure consume_request (req_id : integer; req : in out cached_request_type'class);
-
       function length return count_type;
    private
       cached_requests : cached_request_map.map;
