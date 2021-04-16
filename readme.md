@@ -45,7 +45,7 @@ Interactive Brokers (IB) TWS/IB Gateway communication engine written in Ada.
 
 - This library is not, per se, properly sealed in terms of the highest theoretical standards. Some internal components are not reusable even if they could be candidates. This is on purpose, for now, to help move fast, refactor on the go as I 'reverse discovered' different implementation requirements, keep accessibility simple, and complexity down. I am aligned with the practice of 'semantic compression' as illustrated by Casey Muratori's mantra: [“make your code usable before you try to make it reusable”](https://caseymuratori.com/blog_0015).
 
-- All IB 'far-west, distributed and undocumented' string-based modelization has been severely constrained to enums modeling. Everything is strictly self-documented in ib_ada.ads. This helped lay out robust foundations from the get-go. Beware, some IB types equivalents are already present in ib-ada but nothing supports them; they are not used anywhere. It is just a way to document and have them around for the future. 
+- All IB 'far-west, distributed and undocumented' string-based modelization has been severely constrained to enums modeling. Everything is strictly self-documented in ib_ada.ads. This helped lay out robust foundations from the get-go. Beware, some fundamental IB types equivalents are already present in ib_ada.ads but nothing supports them; they are not used anywhere. It is just a way to document and have them around for the future. 
 
 - This version of ib-ada adapts the IB TWS/IB Gateway 'mixed' communication model ('client-server' + 'streams' + 'message semantic context dependent') to an orthodox client-server model for three main reasons. 
    1. To keep things synchronized as a first step/implementation.
