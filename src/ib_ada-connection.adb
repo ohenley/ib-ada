@@ -72,7 +72,6 @@ package body ib_ada.connection is
                               msg_buffer: Stream_Element_Array (1 .. Ada.Streams.Stream_Element_Offset(msg_length));
                               message_tokens : msg_vector.vector;
                               server_msg : unbounded_String;
-                              pragma Suppress(Elaboration_Check);
                            begin
                               -- read message
                               Ada.Streams.Read (channel.All, msg_buffer, offset);
