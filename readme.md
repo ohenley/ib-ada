@@ -33,7 +33,11 @@ Interactive Brokers (IB) TWS/IB Gateway communication engine written in Ada.
 - Looking at the retail securities investment landscape, my view is that there is a massive opportunity for a robust, well-designed programmatic retail investment infrastructure.
 
 ## Status
-- WIP text. :)
+- This library is not, per se, properly sealed in terms of the highest theoretical standards. Some internal components are not reusable even if they could be candidates. This is on purpose, for now, to help move fast, refactor on the go as I reverse discovered what implementation requirements emerged, keep accessibility simple, complexity down. I am aligned with semantic compression as Casey Muratori illustrates using this mantra: [“make your code usable before you try to make it reusable”](https://caseymuratori.com/blog_0015).
+
+- All IB 'far-west, distributed and undocumented' string-based modelization have been severely constrained to enums modeling. Everything is self-documented in ib_ada.ads. This helped layout robust foundations from the get-go, which can now confidently scale up (if you do not find the type variant you need, add it to the proper enum, it will propagate everywhere and we are done. No ambiguity, ever, at compile time)
+
+- WIP
 
 ## Prerequisites
 - Win32 or Linux platform (tested and working on Windows 10, Lubuntu 20.04.1)
