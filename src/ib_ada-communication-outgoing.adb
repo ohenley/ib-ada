@@ -250,6 +250,7 @@ package body ib_ada.communication.outgoing is
    end;
 
    function build_handshake_msg return string is
+      -- magic spells. undocumented. do not ask.
       v100_prefix   : string := -"API";
       min_version   : string := "142";
       max_version   : string := "152";
@@ -281,7 +282,7 @@ package body ib_ada.communication.outgoing is
       request_account_summary : string := -"62";
       code_1                  : string := -"1";
       req_id                  : string := -request_id;
-      group                   : string := -"All";
+      group                   : string := -"All"; -- do not ask
       tag                     : string := -tag_image(account_tag);
       account_summary_msg     : string := get_serialized_msg(request_account_summary & code_1 & req_id & group & tag);
    begin
@@ -297,23 +298,23 @@ package body ib_ada.communication.outgoing is
       return cancel_accounts_summary_msg;
    end;
 
-   function build_pnl_msg (request_id : integer; account : string; contract_id : integer) return string is
-      request_pnl : string := -"94";
-      req_id      : string := -request_id;
-      acnt        : string := -account;
-      model_code  : string := -"";
-      conid       : string := -contract_id;
-      pnl_msg     : string := get_serialized_msg(request_pnl & req_id & acnt & model_code & conid);
+   function build_profit_and_loss_msg (request_id : integer; account : string; contract_id : integer) return string is
+      request_profit_and_loss : string := -"94";
+      req_id                  : string := -request_id;
+      acnt                    : string := -account;
+      model_code              : string := -"";
+      conid                   : string := -contract_id;
+      profit_and_loss_msg     : string := get_serialized_msg(request_profit_and_loss & req_id & acnt & model_code & conid);
    begin
-      return pnl_msg;
+      return profit_and_loss_msg;
    end;
 
-   function build_cancel_pnl_msg (request_id : integer) return string is
-      request_cancel_pnl : string := -"95";
-      req_id             : string := -request_id;
-      cancel_pnl_msg     : string := get_serialized_msg(request_cancel_pnl & req_id);
+   function build_cancel_profit_and_loss_msg (request_id : integer) return string is
+      request_cancel_profit_and_loss : string := -"95";
+      req_id                         : string := -request_id;
+      cancel_profit_and_loss_msg     : string := get_serialized_msg(request_cancel_profit_and_loss & req_id);
    begin
-      return cancel_pnl_msg;
+      return cancel_profit_and_loss_msg;
    end;
 
    function build_place_order_msg (request_id : integer; contract : contract_type; order : order_type) return string is
@@ -356,7 +357,7 @@ package body ib_ada.communication.outgoing is
       outside_regular_trading_hours     : string := -order.outside_regular_trading_hours;
       hidden                            : string := -order.hidden;
 
-      total_madness_filler              : string := -"";
+      total_madness_filler              : string := -""; -- do not ask
 
       discretionary_amount              : string := -order.discretionary_amount;
       good_after_time                   : string := -order.good_after_time;
@@ -479,7 +480,7 @@ package body ib_ada.communication.outgoing is
       trigger_method &
       outside_regular_trading_hours &
       hidden &
-      total_madness_filler &
+      total_madness_filler & -- yep
       discretionary_amount &
       good_after_time &
       good_till_date &

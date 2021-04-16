@@ -121,16 +121,19 @@ package body ib_ada.communication.incomming is
          if msg_tokens.first_element = "2104" or msg_tokens.first_element = "2106" then
             resp.and_listen := true;
          end if;
-      elsif req.req_id = pnl_single then
+      elsif req.req_id = profit_and_loss_single then
          resp.and_listen := true;
       elsif req.req_id = place_order or req.req_id = fake_order then
          declare
             error : integer := integer'value(+msg_tokens (msg_tokens.first_index + 1));
          begin
             if error = 200 or error = 412 or error = 321 then
-               -- (200) symbol does not exists,
+               -- (200) symbol does not exists.
                -- (412) contract is not available for trading.
                -- (321) the size value cannot be zero.
+               -- only ran into those for the scope of this library.
+               -- eg. adding options (OPT) suport would potentially trigger many others.
+               -- listed here: https://interactivebrokers.github.io/tws-api/message_codes.html
                resp.and_listen := false;
             else
                resp.and_listen := true;
@@ -210,13 +213,13 @@ package body ib_ada.communication.incomming is
       return resp;
    end;
 
-   function handle_pnl_single_msg (req : req_type; msg_tokens : in out msg_vector.vector; msg_handler : msg_handler_type) return resp_type is
+   function handle_profit_and_loss_single_msg (req : req_type; msg_tokens : in out msg_vector.vector; msg_handler : msg_handler_type) return resp_type is
       resp           : resp_type;
       request_number : integer := integer'value(+msg_tokens(msg_tokens.first_index));
       current_value  : safe_float := get_safe_float(+msg_tokens(msg_tokens.first_index + 5));
       -- f*** the rest as it cannot be relied upon. often you will receive this crap anyway:
       -- <error> 331 2150 invalid position trade derived value
-      -- and from the pnl message itself, only current total value is valid.
+      -- and from the p&l message itself, only current total value is valid.
       cache_request  : profit_and_loss_cached_request_type;
       account_id     : unbounded_string;
    begin
@@ -238,7 +241,7 @@ package body ib_ada.communication.incomming is
       end loop;
 
       resp.and_listen := false;
-      resp.resp_id := pnl_single;
+      resp.resp_id := profit_and_loss_single;
       return resp;
    end;
 
@@ -405,17 +408,17 @@ package body ib_ada.communication.incomming is
 
 begin
 
-   msg_definitions.include(+"0",  (server_infos,        codes((1 => 0)),                  handle_session_datetime_msg'access));
-   msg_definitions.include(+"15", (managed_accounts,    codes((1 => 15, 2 => 1)),         handle_managed_accounts_msg'access));
-   msg_definitions.include(+"9",  (next_valid_id,       codes((1 => 9, 2 => 1)),          handle_next_valid_id_msg'access));
-   msg_definitions.include(+"4",  (error,               codes((1 => 4, 2 => 2, 3 => -1)), handle_error_msg'access));
-   msg_definitions.include(+"61", (positions,           codes((1 => 61,  2 => 3)),        handle_position_msg'access));
-   msg_definitions.include(+"62", (positions_end,       codes((1 => 62,  2 => 1)),        handle_position_end_msg'access));
-   msg_definitions.include(+"63", (account_summary,     codes((1 => 63, 2 => 1)),         handle_account_summary_msg'access));
-   msg_definitions.include(+"64", (account_summary_end, codes((1 => 64, 2 => 1)),         handle_account_summary_end_msg'access));
-   msg_definitions.include(+"95", (pnl_single,          codes((1 => 95)),                 handle_pnl_single_msg'access));
-   msg_definitions.include(+"5",  (open_order,          codes((1 => 5)),                  handle_open_order_msg'access));
-   msg_definitions.include(+"3",  (order_status,        codes((1 => 3)),                  handle_order_status_msg'access));
-   msg_definitions.include(+"53", (open_orders_end,     codes((1 => 53)),                 handle_open_orders_end_msg'access));
+   msg_definitions.include(+"0",  (server_infos,           codes((1 => 0)),                  handle_session_datetime_msg'access));
+   msg_definitions.include(+"15", (managed_accounts,       codes((1 => 15, 2 => 1)),         handle_managed_accounts_msg'access));
+   msg_definitions.include(+"9",  (next_valid_id,          codes((1 => 9, 2 => 1)),          handle_next_valid_id_msg'access));
+   msg_definitions.include(+"4",  (error,                  codes((1 => 4, 2 => 2, 3 => -1)), handle_error_msg'access));
+   msg_definitions.include(+"61", (positions,              codes((1 => 61,  2 => 3)),        handle_position_msg'access));
+   msg_definitions.include(+"62", (positions_end,          codes((1 => 62,  2 => 1)),        handle_position_end_msg'access));
+   msg_definitions.include(+"63", (account_summary,        codes((1 => 63, 2 => 1)),         handle_account_summary_msg'access));
+   msg_definitions.include(+"64", (account_summary_end,    codes((1 => 64, 2 => 1)),         handle_account_summary_end_msg'access));
+   msg_definitions.include(+"95", (profit_and_loss_single, codes((1 => 95)),                 handle_profit_and_loss_single_msg'access));
+   msg_definitions.include(+"5",  (open_order,             codes((1 => 5)),                  handle_open_order_msg'access));
+   msg_definitions.include(+"3",  (order_status,           codes((1 => 3)),                  handle_order_status_msg'access));
+   msg_definitions.include(+"53", (open_orders_end,        codes((1 => 53)),                 handle_open_orders_end_msg'access));
 
 end ib_ada.communication.incomming;

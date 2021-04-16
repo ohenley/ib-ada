@@ -120,34 +120,34 @@ package body ib_ada.communication is
 
    procedure profit_and_loss (account_id : string; contract_id : integer) is
       use ib_ada.communication.outgoing;
-      request_number : integer  := unique_id.get_unique_id(next_valid_request_id);
-      pnl_msg        : req_type := (request_number, +build_pnl_msg(request_number, account_id, contract_id), true, pnl_single);
-      cancel_pnl     : req_type := (request_number, +build_cancel_pnl_msg(request_number), false, pnl_cancel_single);
-      resp           : resp_type;
-      cache_request  : profit_and_loss_cached_request_type;
+      request_number         : integer  := unique_id.get_unique_id(next_valid_request_id);
+      profit_and_loss_msg    : req_type := (request_number, +build_profit_and_loss_msg(request_number, account_id, contract_id), true, profit_and_loss_single);
+      cancel_profit_and_loss : req_type := (request_number, +build_cancel_profit_and_loss_msg(request_number), false, cancel_profit_and_loss_single);
+      resp                   : resp_type;
+      cache_request          : profit_and_loss_cached_request_type;
    begin
       cache_request.account_id := +account_id;
       cache_request.contract_id := contract_id;
       cached_requests.cache_request (request_number, cache_request);
 
-      ib_ada.connection.client.send(pnl_msg, resp);
+      ib_ada.connection.client.send(profit_and_loss_msg, resp);
 
       if resp.resp_id /= error then
-         ib_ada.connection.client.send(cancel_pnl, resp);
+         ib_ada.connection.client.send(cancel_profit_and_loss, resp);
       end if;
    end;
 
    procedure profits_and_losses is
       use ib_ada.communication.outgoing;
 
-      type pnl_argument is
+      type profit_and_loss_argument is
          record
             account_id  : unbounded_string;
             contract_id : integer;
          end record;
 
-      package pnl_argument_vector is new vectors (natural, pnl_argument);
-      pnl_arguments : pnl_argument_vector.vector;
+      package profit_and_loss_argument_vector is new vectors (natural, profit_and_loss_argument);
+      profit_and_loss_arguments : profit_and_loss_argument_vector.vector;
       account_id    : unbounded_string;
       contract_id   : integer;
    begin
@@ -155,11 +155,11 @@ package body ib_ada.communication is
          account_id := account_map.key(account);
          for pos in accounts(account_id).positions.iterate loop
             contract_id := position_map.element(pos).contract.contract_id;
-            pnl_arguments.append((account_id, contract_id));
+            profit_and_loss_arguments.append((account_id, contract_id));
          end loop;
       end loop;
 
-      for argument of pnl_arguments loop
+      for argument of profit_and_loss_arguments loop
          profit_and_loss(+argument.account_id, argument.contract_id);
       end loop;
    end;
