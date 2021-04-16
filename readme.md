@@ -26,7 +26,7 @@ Interactive Brokers (IB) TWS/IB Gateway communication engine written in Ada.
 ## About
 - I started this project because every other 'equivalent' implementation I tested, somewhat, did not work properly ... and I tried most of them all (C++, C#, Python, JS, official and third-party. I gave up before installing a whole Java developper environment just to test if, maybe, this time the outcome would be different).
 
-- I hold a firm grudge against Interactive Brokers for misleading advertising about their technology offering. I personnally paid the price of such painfull discovery through hundred hours of research, testing, dead end and headaches. This library is a conservative, explicit, sandboxed, progressive, simple, and hopefully sane response to this reality. 
+- I hold a certain grudge against Interactive Brokers for misleading advertising about their technology offering. I personnally paid the price of such painfull discovery through hundred hours of research, testing, dead end and headaches. This library is a conservative, explicit, sandboxed, progressive, simple, and hopefully sane response to this reality. 
 
 - From an 'archeological/reverse engineering' point of view we can argue that Interactive Brokers relevance and churn is subsided by technological debt; probably on purpose as a way to pressure their premium product adoption (FIX protocol access @ 1500 USD/month)
 
