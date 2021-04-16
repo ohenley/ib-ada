@@ -215,6 +215,14 @@ package body ib_ada.communication is
       ib_ada.connection.client.send(open_orders_msg, resp);
    end;
 
+   function get_commission (request_number : integer) return safe_float is
+      cache_request : commission_cached_request_type;
+   begin
+      cached_requests.consume_request(request_number, cache_request);
+      return cache_request.commission;
+   end;
+
+   -- [wip] cannot test, because I am not subscribed.
    procedure market_data (symbol : string; contract_id : integer) is
       use ib_ada.communication.outgoing;
       request_number : integer := unique_id.get_unique_id(next_valid_request_id);
@@ -231,14 +239,6 @@ package body ib_ada.communication is
       begin
          ib_ada.connection.client.send(market_data_msg, resp);
       end;
-
-   end;
-
-   function get_commission (request_number : integer) return safe_float is
-      cache_request : commission_cached_request_type;
-   begin
-      cached_requests.consume_request(request_number, cache_request);
-      return cache_request.commission;
    end;
 
 end ib_ada.communication;

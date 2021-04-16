@@ -576,7 +576,7 @@ package body ib_ada.communication.outgoing is
       return open_orders_msg;
    end;
 
-   -- [wip] unfinished, cannot test, because i am not subscribed.
+   -- [wip] cannot test, because I am not subscribed.
    function build_market_data_msg (request_id : integer; contract : contract_type) return string is
       market_data                       : string := -"1";
       version                           : string := -"11";
@@ -627,7 +627,7 @@ package body ib_ada.communication.outgoing is
       return market_data_msg;
    end;
 
-   -- [wip] unfinished because cannot test, see build_market_data_msg comment
+   --- [wip] cannot test, because I am not subscribed.
    function build_cancel_market_data_msg return string is
       cancel_market_data : string := -"2";
    begin

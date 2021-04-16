@@ -113,10 +113,10 @@ package ib_ada.communication is
    function place_fake_order (side: order_side_type; symbol : string; quantity : integer; at_price_type : order_at_price_type) return integer;
    procedure cancel_order (request_number : integer);
    procedure open_orders;
-
-
-   procedure market_data (symbol : string; contract_id : integer);
    function get_commission (request_number : integer) return safe_float;
+
+   -- [wip] cannot test, because I am not subscribed.
+   procedure market_data (symbol : string; contract_id : integer);
 
 end ib_ada.communication;
 

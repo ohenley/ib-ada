@@ -29,6 +29,8 @@ package ib_ada.communication.outgoing is
    function build_cancel_pnl_msg (request_id : integer) return string;
    function build_place_order_msg (request_id : integer; contract : contract_type; order : order_type) return string;
    function build_cancel_order_msg (request_id : integer) return string;
+
+   -- [wip] cannot test, because I am not subscribed.
    function build_open_orders_msg return string;
    function build_market_data_msg (request_id : integer; contract : contract_type) return string;
 
