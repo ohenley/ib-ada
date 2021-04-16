@@ -58,6 +58,8 @@ Interactive Brokers (IB) TWS/IB Gateway communication engine written in Ada.
 - By chance, every answer context sequences (coming from TWS/IB Gateway) are, from observation, deterministic and unique so once we know what will come our way it is easy to 'encode' the receiving context behavior (see the use of req_type/resp_type used in combination throughout the different answer handlers. It might not be the cleaner way but it works well. So for the moment thats that). You just get surprised the first time. Open an issue if/when that happens or help me out by proposing a pull request.
 
 ## Prerequisites
+- An activated Interactive Brokers (IB) account.
+- [TWS](https://www.interactivebrokers.ca/en/index.php?f=16040) or [IB Gateway](https://www.interactivebrokers.ca/en/index.php?f=16457) running and listening to standard IB ports. (or consult ib_ada.ads and adapt preconfigured ones) 
 - Win32 or Linux platform (tested and working on Windows 10, Lubuntu 20.04.1)
 - GNAT (tested and working with GNAT community 2020, GNAT FSF 9.3.0)
 
