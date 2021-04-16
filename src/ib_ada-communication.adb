@@ -1,3 +1,19 @@
+--  SPDX-License-Identifier: Apache-2.0
+--
+--  Copyright (c) 2021 ohenley <olivier.henley@gmail.com>
+--
+--  Licensed under the Apache License, Version 2.0 (the "License");
+--  you may not use this file except in compliance with the License.
+--  You may obtain a copy of the License at
+--
+--      http://www.apache.org/licenses/LICENSE-2.0
+--
+--  Unless required by applicable law or agreed to in writing, software
+--  distributed under the License is distributed on an "AS IS" BASIS,
+--  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+--  See the License for the specific language governing permissions and
+--  limitations under the License.
+
 with ada.containers.indefinite_hashed_maps;
 with ada.calendar;
 with ada.text_io;
@@ -102,7 +118,7 @@ package body ib_ada.communication is
       ib_ada.connection.client.send(positions_msg, resp);
    end;
 
-   procedure pnl (account_id : string; contract_id : integer) is
+   procedure profit_and_loss (account_id : string; contract_id : integer) is
       use ib_ada.communication.outgoing;
       request_number : integer  := unique_id.get_unique_id(next_valid_request_id);
       pnl_msg        : req_type := (request_number, +build_pnl_msg(request_number, account_id, contract_id), true, pnl_single);
@@ -121,7 +137,7 @@ package body ib_ada.communication is
       end if;
    end;
 
-   procedure pnls is
+   procedure profits_and_losses is
       use ib_ada.communication.outgoing;
 
       type pnl_argument is
@@ -144,7 +160,7 @@ package body ib_ada.communication is
       end loop;
 
       for argument of pnl_arguments loop
-         pnl(+argument.account_id, argument.contract_id);
+         profit_and_loss(+argument.account_id, argument.contract_id);
       end loop;
    end;
 

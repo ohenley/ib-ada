@@ -1,3 +1,19 @@
+--  SPDX-License-Identifier: Apache-2.0
+--
+--  Copyright (c) 2021 ohenley <olivier.henley@gmail.com>
+--
+--  Licensed under the Apache License, Version 2.0 (the "License");
+--  you may not use this file except in compliance with the License.
+--  You may obtain a copy of the License at
+--
+--      http://www.apache.org/licenses/LICENSE-2.0
+--
+--  Unless required by applicable law or agreed to in writing, software
+--  distributed under the License is distributed on an "AS IS" BASIS,
+--  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+--  See the License for the specific language governing permissions and
+--  limitations under the License.
+
 with ada.text_io;
 with ada.text_io.unbounded_io;
 with ada.characters.handling;
@@ -214,7 +230,7 @@ package body ib_ada.communication.incomming is
                   declare
                      open_value : safe_float := accounts(account_id).positions(pos).average_cost * safe_float(accounts(account_id).positions(pos).quantity);
                   begin
-                     accounts(account_id).positions(pos).pnl_unrealized := current_value - open_value;
+                     accounts(account_id).positions(pos).unrealized_profit := current_value - open_value;
                   end;
                end if;
             end loop;

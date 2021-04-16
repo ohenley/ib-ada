@@ -1,4 +1,21 @@
+--  SPDX-License-Identifier: Apache-2.0
+--
+--  Copyright (c) 2021 ohenley <olivier.henley@gmail.com>
+--
+--  Licensed under the Apache License, Version 2.0 (the "License");
+--  you may not use this file except in compliance with the License.
+--  You may obtain a copy of the License at
+--
+--      http://www.apache.org/licenses/LICENSE-2.0
+--
+--  Unless required by applicable law or agreed to in writing, software
+--  distributed under the License is distributed on an "AS IS" BASIS,
+--  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+--  See the License for the specific language governing permissions and
+--  limitations under the License.
+
 with gnat.sockets;
+-------------------------------------------
 with ada.strings.unbounded;
 with ada.strings.unbounded.hash;
 with ada.strings.hash;
@@ -19,18 +36,18 @@ package ib_ada is
    function "+" (value : string) return unbounded_string is
      (to_unbounded_string(value));
 
-   type security_type is (STK, OPT, FUT, IND, FOP, CASH, BAG, WAR, BOND, CMDTY, NEWS, FUND, UNDEFINED);
+   type security_type            is (STK, OPT, FUT, IND, FOP, CASH, BAG, WAR, BOND, CMDTY, NEWS, FUND, UNDEFINED);
    type security_identifier_type is (ISIN, CUSIP, UNDEFINED);
-   type right_type is (PUT, CALL, UNDEFINED);
-   type multiplier_type is (OPTIONS, FUTURES, UNDEFINED);
+   type right_type               is (PUT, CALL, UNDEFINED);
+   type multiplier_type          is (OPTIONS, FUTURES, UNDEFINED);
 
    -- exchange list @ https://www.interactivebrokers.ca/en/index.php?f=1562
-   type exchange_type is (SMART, NASDAQ, NYSE, AMEX, IDEALPRO, ONE, GLOBEX, CBOE, UNDEFINED);
-   type currency_type is (USD, CAD, UNDEFINED);
-   type trading_class_type is (NMS, SCM, UNDEFINED);
+   type exchange_type            is (SMART, NASDAQ, NYSE, AMEX, IDEALPRO, ONE, GLOBEX, CBOE, UNDEFINED);
+   type currency_type            is (USD, CAD, UNDEFINED);
+   type trading_class_type       is (NMS, SCM, UNDEFINED);
 
-   type session_type is (TWS_LIVE, TWS_PAPER, IB_LIVE, IB_PAPER, UNDEFINED);
-   type session_port_type is array (session_type) of gnat.sockets.port_type;
+   type session_type             is (TWS_LIVE, TWS_PAPER, IB_LIVE, IB_PAPER, UNDEFINED);
+   type session_port_type        is array (session_type) of gnat.sockets.port_type;
 
    ports : session_port_type := (TWS_LIVE  => 7496,
                                  TWS_PAPER => 7497,
@@ -57,22 +74,23 @@ package ib_ada is
       delta_neutral_contract            : boolean                  := false;
    end record;
 
-   type order_side_type is (BUY, SELL, UNDEFINED);
-   type order_at_price_type is (MKT, MIDPRICE, UNDEFINED);
-   type order_status_type is (PENDING_SUBMIT, PENDING_CANCEL, PRE_SUBMITTED, SUBMITTED, API_CANCELLED, CANCELLED, FILLED, INACTIVE, UNDEFINED);
+   type order_side_type      is (BUY, SELL, UNDEFINED);
+   type order_at_price_type  is (MKT, MIDPRICE, UNDEFINED);
+   type order_status_type    is (PENDING_SUBMIT, PENDING_CANCEL, PRE_SUBMITTED, SUBMITTED,
+                                 API_CANCELLED, CANCELLED, FILLED, INACTIVE, UNDEFINED);
 
    function order_status_image (order_status : order_status_type) return string;
    function order_status_value (order_status : string) return order_status_type;
 
-   type time_in_force_type is (DAY, GTC, IOC, GTD, OPG, FOK, DTC, UNDEFINED);
-   type open_close_type is (O, C, UNDEFINED);
-   type rule_80a_type is (INDIVIDUAL, AGENCY, AGENT_OTHER_MEMBER,
-                          INDIVIDUAL_P_T_I_A, AGENCY_P_T_I_A, AGENT_OTHER_MEMBER_P_T_I_A,
-                          INDIVIDUAK_P_T, AGENCY_P_T, AGENT_OTHER_MEMBER_P_T, UNDEFINED);
+   type time_in_force_type   is (DAY, GTC, IOC, GTD, OPG, FOK, DTC, UNDEFINED);
+   type open_close_type      is (O, C, UNDEFINED);
+   type rule_80a_type        is (INDIVIDUAL, AGENCY, AGENT_OTHER_MEMBER,
+                                 INDIVIDUAL_P_T_I_A, AGENCY_P_T_I_A, AGENT_OTHER_MEMBER_P_T_I_A,
+                                 INDIVIDUAK_P_T, AGENCY_P_T, AGENT_OTHER_MEMBER_P_T, UNDEFINED);
 
-   type hedge_value_type is (D, B, F, P, UNDEFINED);
+   type hedge_value_type     is (D, B, F, P, UNDEFINED);
    type clearing_intent_type is (I_B, AWAY, P_T_A, UNDEFINED);
-   type algo_strategy_type is (ARRIVAL_P_X, DARK_ICE, PCT_VOL, TWAP, VWAP, UNDEFINED);
+   type algo_strategy_type   is (ARRIVAL_P_X, DARK_ICE, PCT_VOL, TWAP, VWAP, UNDEFINED);
 
    type order_type is record
       -- technical debt?
@@ -180,11 +198,11 @@ package ib_ada is
    package open_order_vector is new ada.containers.vectors(index_type => natural, element_type => open_order_type);
 
    type position_type is record
-      contract       : contract_type;
-      quantity       : integer := -1;
-      average_cost   : safe_float := safe_float'last;
-      pnl_unrealized : safe_float := safe_float'last;
-      open_value     : safe_float := safe_float'last;
+      contract          : contract_type;
+      quantity          : integer := -1;
+      average_cost      : safe_float := safe_float'last;
+      unrealized_profit : safe_float := safe_float'last;
+      open_value        : safe_float := safe_float'last;
    end record;
 
    package position_map is new indefinite_hashed_maps

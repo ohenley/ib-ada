@@ -1,3 +1,18 @@
+--  SPDX-License-Identifier: Apache-2.0
+--
+--  Copyright (c) 2021 ohenley <olivier.henley@gmail.com>
+--
+--  Licensed under the Apache License, Version 2.0 (the "License");
+--  you may not use this file except in compliance with the License.
+--  You may obtain a copy of the License at
+--
+--      http://www.apache.org/licenses/LICENSE-2.0
+--
+--  Unless required by applicable law or agreed to in writing, software
+--  distributed under the License is distributed on an "AS IS" BASIS,
+--  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+--  See the License for the specific language governing permissions and
+--  limitations under the License.
 
 with ada.containers.vectors;
 with ada.calendar;
@@ -91,8 +106,8 @@ package ib_ada.communication is
    procedure start_api;
    procedure accounts_summary (tag : tag_type);
    procedure positions;
-   procedure pnl (account_id : string; contract_id : integer);
-   procedure pnls;
+   procedure profit_and_loss (account_id : string; contract_id : integer);
+   procedure profits_and_losses;
    function place_order (contract : contract_type; order : order_type) return integer;
    function place_order (side: order_side_type; symbol : string; quantity : integer; at_price_type : order_at_price_type) return integer;
    function place_fake_order (side: order_side_type; symbol : string; quantity : integer; at_price_type : order_at_price_type) return integer;
