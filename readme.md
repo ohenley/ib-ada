@@ -75,7 +75,7 @@ Only works for stocks and provides a minimum viable interface to the TWS/IB Gate
 ## Usage
 - Being library code, ib-ada is to be driven by another application. See [ib-rest](https://github.com/ohenley/ib-rest).
 - This library interface are essentially calls exposed in ib_ada-communication.ads/adb. 
-- This library is not, per se, properly sealed in terms of the highest Ada standards. This was on purpose to help move fast, and refactor on the go as I reverse discovered what implementation requirements emerged.    
+- This library is not, per se, properly sealed in terms of the highest Ada standards. This was on purpose to help move fast, refactor on the go as I reverse discovered what implementation requirements emerged.    
 
 ## Acknowledgments
 - Thanks to @erdewit for his (ib_insync)[https://github.com/erdewit/ib_insync] work which provided a sound 'reverse engineering map'.
