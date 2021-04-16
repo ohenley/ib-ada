@@ -100,7 +100,6 @@ package body ib_ada.communication.incomming is
       resp.resp_id := managed_accounts;
       for e of found_accounts loop
          ib_ada.accounts.include(e, new_account);
-         put_line(+e);
       end loop;
       return resp;
    end;
@@ -348,7 +347,6 @@ package body ib_ada.communication.incomming is
       resp.resp_id := open_orders_end;
       return resp;
    end;
-
 
    function parse_message (msg : unbounded_string) return msg_vector.vector is
       message_tokens : msg_vector.vector;

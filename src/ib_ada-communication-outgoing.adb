@@ -24,7 +24,7 @@ use ada.text_io;
 
 package body ib_ada.communication.outgoing is
 
-   function "-" (field : string) return String is
+   function "-" (field : string) return string is
    begin
       return field & ascii.nul;
    end;
@@ -40,7 +40,7 @@ package body ib_ada.communication.outgoing is
       if field = integer'last then
          return -"";
       else
-         return -trim(field'image, Ada.Strings.Left);
+         return -trim(field'image, ada.strings.left);
       end if;
    end;
 
@@ -49,7 +49,7 @@ package body ib_ada.communication.outgoing is
       if field = safe_float'last then
          return -"";
       else
-         return -trim(field'image, Ada.Strings.Left);
+         return -trim(field'image, ada.strings.left);
       end if;
    end;
 
@@ -197,7 +197,7 @@ package body ib_ada.communication.outgoing is
       end if;
    end;
 
-   package integer_io is new Ada.direct_io(integer);
+   package integer_io is new ada.direct_io(integer);
 
    protected body unique_id is
       function get_unique_id (next_valid_id : integer) return integer is

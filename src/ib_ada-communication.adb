@@ -26,7 +26,6 @@ use ada.containers;
 use ada.text_io;
 use ada.strings.fixed;
 
-
 package body ib_ada.communication is
 
    protected body cached_requests is
