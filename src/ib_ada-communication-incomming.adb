@@ -132,7 +132,7 @@ package body ib_ada.communication.incomming is
                -- (412) contract is not available for trading.
                -- (321) the size value cannot be zero.
                -- only ran into those for the scope of this library.
-               -- eg. adding options (OPT) suport would potentially trigger many others.
+               -- eg. adding options (OPT) support would potentially trigger many others.
                -- listed here: https://interactivebrokers.github.io/tws-api/message_codes.html
                resp.and_listen := false;
             else
