@@ -252,7 +252,7 @@ package body ib_ada.communication.outgoing is
    function build_handshake_msg return string is
       -- magic spells. undocumented. do not ask.
       v100_prefix   : string := -"API";
-      min_version   : string := "142";
+      min_version   : string := "152";
       max_version   : string := "152";
       v100_version  : string := "v" & min_version & ".." & max_version;
       handshake_msg : string := v100_prefix & get_serialized_msg(v100_version);
