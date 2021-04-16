@@ -44,16 +44,20 @@ Interactive Brokers (IB) TWS/IB Gateway communication engine written in Ada.
 
 ## Building
 #### Windows
-- Install (GNAT community 2020)[https://community.download.adacore.com/v1/966801764ae160828c97d2c33000e9feb08d4cce?filename=gnat-2020-20200429-x86_64-windows-bin.exe]
-`$ git clone https://github.com/ohenley/ib-ada.git`      
-`$ cd ib_ada`
-`$ gprbuild ib_ada.gpr`
+- Install [GNAT community 2020](https://community.download.adacore.com/v1/966801764ae160828c97d2c33000e9feb08d4cce?filename=gnat-2020-20200429-x86_64-windows-bin.exe)
+```
+$ git clone https://github.com/ohenley/ib-ada.git    
+$ cd ib_ada
+$ gprbuild ib_ada.gpr
+```
    
 #### Linux (ubuntu 20.04.1+ flavors)
-`$ sudo apt-get install gnat-gps`
-`$ git clone https://github.com/ohenley/ib-ada.git`
-`$ cd ib_ada`
-`$ gprbuild ib_ada.gpr`
+```
+$ sudo apt-get install gnat-gps
+$ git clone https://github.com/ohenley/ib-ada.git
+$ cd ib_ada
+$ gprbuild ib_ada.gpr
+```
 
 ## Installation
 Not Applicable.
@@ -61,7 +65,7 @@ Not Applicable.
 ## Limitations
 Only works for stocks and provides a minimum viable interface to the TWS/IB Gateway for a typical trading bot. Complete but no fancy, namely:
 
-- accounts information (account_ids and different balance types)
+- accounts information (account ids and different balance types)
 - positions
 - profit and loss for positions
 - open orders
@@ -69,9 +73,9 @@ Only works for stocks and provides a minimum viable interface to the TWS/IB Gate
 - potential order commission (through fake place orders)
 
 ## Usage
-Being library code, ib-ada is to be driven by another application. See (ib-rest)[https://github.com/ohenley/ib-rest].
+Being library code, ib-ada is to be driven by another application. See [ib-rest](https://github.com/ohenley/ib-rest).
 This library interface is the calls exposed in ib_ada-communication.ads/adb. 
 
 ## Acknowledgments
-- Thanks to @erdewit for his (ib_insync)[https://github.com/erdewit/ib_insync] work which provided a sound 'reverse engineering map'.
-- Thanks to @maxicus for his (ib-tws-api)[https://github.com/maxicus/ib-tws-api] work which provided a sound 'reverse engineering map'.
+- Thanks to @erdewit for his [ib_insync](https://github.com/erdewit/ib_insync) work which provided a sound 'reverse engineering map'.
+- Thanks to @maxicus for his [ib-tws-api](https://github.com/maxicus/ib-tws-api) work which provided a sound 'reverse engineering map'.
