@@ -217,7 +217,7 @@ package body ib_ada.communication.incomming is
       -- f*** the rest as it cannot be relied upon. often you will receive this crap anyway:
       -- <error> 331 2150 invalid position trade derived value
       -- and from the pnl message itself, only current total value is valid.
-      cache_request  : pnl_cached_request_type;
+      cache_request  : profit_and_loss_cached_request_type;
       account_id     : unbounded_string;
    begin
       cached_requests.consume_request(request_number, cache_request);

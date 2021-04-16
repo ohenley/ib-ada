@@ -77,7 +77,7 @@ package ib_ada.communication is
 
    type cached_request_type is abstract tagged null record;
 
-   type pnl_cached_request_type is new cached_request_type with
+   type profit_and_loss_cached_request_type is new cached_request_type with
       record
          account_id  : unbounded_string;
          contract_id : integer;

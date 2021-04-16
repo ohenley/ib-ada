@@ -124,7 +124,7 @@ package body ib_ada.communication is
       pnl_msg        : req_type := (request_number, +build_pnl_msg(request_number, account_id, contract_id), true, pnl_single);
       cancel_pnl     : req_type := (request_number, +build_cancel_pnl_msg(request_number), false, pnl_cancel_single);
       resp           : resp_type;
-      cache_request  : pnl_cached_request_type;
+      cache_request  : profit_and_loss_cached_request_type;
    begin
       cache_request.account_id := +account_id;
       cache_request.contract_id := contract_id;
