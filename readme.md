@@ -78,5 +78,5 @@ Only works for stocks and provides a minimum viable interface to the TWS/IB Gate
 - This library is not, per se, properly sealed in terms of the highest Ada standards. This was on purpose to help move fast, refactor on the go as I reverse discovered what implementation requirements emerged.    
 
 ## Acknowledgments
-- Thanks to @erdewit for his (ib_insync)[https://github.com/erdewit/ib_insync] work which provided a sound 'reverse engineering map'.
-- Thanks to @maxicus for his (ib-tws-api)[https://github.com/maxicus/ib-tws-api] work which provided a sound 'reverse engineering map'.
+- Thanks to @erdewit for his [ib_insync](https://github.com/erdewit/ib_insync) work which provided a sound 'reverse engineering map'.
+- Thanks to @maxicus for his [ib-tws-api](https://github.com/maxicus/ib-tws-api) work which provided a sound 'reverse engineering map'.
