@@ -1,14 +1,13 @@
 
 with GNAT.Sockets; use GNAT.Sockets;
+
 with Ada.Streams;
 
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 with Ada.Containers.Vectors; use Ada.Containers;
 
---with ib_ada.communication; --use ib_ada.communication;
 with ib_ada.communication.incomming;
-
 
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.IO_Exceptions;
@@ -18,7 +17,7 @@ with System; use System;
 
 with Ada.Unchecked_Conversion;
 
-package body ib_ada.conn is
+package body ib_ada.connection is
 
    function to_length is new Ada.Unchecked_Conversion (source => string, target => integer);
 
@@ -28,10 +27,11 @@ package body ib_ada.conn is
       address    : Sock_Addr_Type;
       channel    : Stream_Access;
       offset     : Stream_Element_Count;
-      --done       : boolean := false;
    begin
       loop
-         delay 0.01; -- throttle 100 calls/sec max
+         delay 0.01;
+         -- throttle 100 calls/sec max.
+         -- interactive broker maximum allowed frequency
          select
             accept setup (session : session_type) do
                GNAT.Sockets.Initialize;
@@ -56,22 +56,18 @@ package body ib_ada.conn is
                   msg_header_swap : string(1..4);
                   msg_length : integer;
                begin
-                  --msg_queue_monitor.consume_message_from_queue (msg);
                   if req.msg /= "" then
+
                      -- client call
-                     put_line ("---------------------------------------------------------------");
-                     --put_line (+req.msg & "REQUEST");
                      string'write(channel, +req.msg);
+
+                     -- and listen..?
                      if req.and_listen then
                         loop -- read server messages until a handler says its over
-                             -- read header
+                           -- read header
                            string'read(channel, msg_header);
                            msg_header_swap := (msg_header(msg_header'last), msg_header(msg_header'last-1), msg_header(msg_header'last-2), msg_header(msg_header'last-3));
                            msg_length := to_length (msg_header_swap);
-
-                           --put_line (msg_length'image);
-
-
                            declare
                               msg_buffer: Stream_Element_Array (1 .. Ada.Streams.Stream_Element_Offset(msg_length));
                               message_tokens : msg_vector.vector;
@@ -83,15 +79,13 @@ package body ib_ada.conn is
                               for i in msg_buffer'range loop
                                  append (server_msg, Character'Val (msg_buffer (I)));
                               end loop;
-                              -- handle message
-                              --put_line(+server_msg & "SERVER ANSWER");
                               resp := ib_ada.communication.incomming.handle_message (req, server_msg);
                            end;
 
                            exit when not resp.and_listen;
+
                         end loop;
                      end if;
-                     --put_line ("exit reading server answers");
                   end if;
                end;
             end send;
@@ -104,7 +98,7 @@ package body ib_ada.conn is
       when others =>
          Ada.Text_IO.Put_Line ("!!!!!!!!!!! Error !!!!!!!!!!!!");
    end;
-end ib_ada.conn;
+end ib_ada.connection;
 
 
 --

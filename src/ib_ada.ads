@@ -1,12 +1,13 @@
 with GNAT.Sockets;
-
-with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
-
-with Ada.Containers.Indefinite_Hashed_Maps; use Ada.Containers;
-
+with Ada.Strings.Unbounded;
 with Ada.Strings.Unbounded.Hash;
-
 with Ada.Strings.Hash;
+with Ada.Containers.Indefinite_Hashed_Maps;
+with Ada.Containers.Vectors;
+
+use Ada.Strings.Unbounded;
+use Ada.Containers;
+
 
 package ib_ada is
 
@@ -175,23 +176,15 @@ package ib_ada is
          order : order_type;
          contract : contract_type;
          request_id : integer;
-         --status : order_status_type := UNDEFINED;
       end record;
 
-   package open_order_map is new indefinite_hashed_maps
-       (Key_Type        => unbounded_string,
-        Element_Type    => open_order_type,
-        Hash            => Ada.Strings.Unbounded.Hash,
-        Equivalent_Keys => "=");
-
+   package open_order_vector is new Ada.containers.vectors(Index_Type => natural, element_type => open_order_type);
 
    type position_type is record
       contract       : contract_type;
       quantity         : integer := -1;
       average_cost   : safe_float := safe_float'last;
       pnl_unrealized : safe_float := safe_float'last;
-      pnl_realized   : safe_float := safe_float'last;
-      pnl_daily      : safe_float := safe_float'last;
       open_value     : safe_float := safe_float'last;
    end record;
 
@@ -238,7 +231,7 @@ package ib_ada is
         Equivalent_Keys => "=");
 
    type act_type is record
-      open_orders : open_order_map.map;
+      open_orders : open_order_vector.vector;
       positions : position_map.map;
       summaries : summary_map.map;
    end record;

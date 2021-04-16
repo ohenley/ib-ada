@@ -1,4 +1,5 @@
-with Ada.Containers.Vectors; use Ada.Containers;
+with Ada.Containers.Vectors;
+use Ada.Containers;
 
 package ib_ada.communication.incomming is
 

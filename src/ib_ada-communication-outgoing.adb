@@ -1,11 +1,10 @@
---with ib_ada.connection;
---with ib_ada.conn;
-
 with Ada.Direct_IO;
 with Ada.Directories;
+with Ada.Strings.Fixed;
+with Ada.Text_IO;
 
-with Ada.Strings.Fixed; use Ada.Strings.Fixed;
-with Ada.Text_IO; use Ada.Text_IO;
+use Ada.Strings.Fixed;
+use Ada.Text_IO;
 
 package body ib_ada.communication.outgoing is
 
@@ -263,15 +262,24 @@ package body ib_ada.communication.outgoing is
       return positions_msg;
    end;
 
-   function build_accounts_summary_msg (account_tag : tag_type) return string is
+   function build_accounts_summary_msg (request_id : integer; account_tag : tag_type) return string is
       request_account_summary : string := -"62";
       code_1 : string := -"1";
-      request_id : string := -unique_id.get_unique_id (next_valid_request_id);
+      req_id : string := -request_id;
       group : string := -"All";
       tag : string := -tag_image (account_tag);
-      account_summary_msg : string := get_serialized_msg (request_account_summary & code_1 & request_id & group & tag);
+      account_summary_msg : string := get_serialized_msg (request_account_summary & code_1 & req_id & group & tag);
    begin
       return account_summary_msg;
+   end;
+
+   function build_cancel_accounts_summary_msg (request_id : integer) return string is
+      request_cancel_accounts_summary : string := -"63";
+      code_1 : string := -"1";
+      req_id : string := -request_id;
+      cancel_accounts_summary_msg : string := get_serialized_msg (request_cancel_accounts_summary & code_1 & req_id);
+   begin
+      return cancel_accounts_summary_msg;
    end;
 
 

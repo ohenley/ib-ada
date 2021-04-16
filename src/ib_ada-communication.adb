@@ -1,12 +1,15 @@
-with Ada.Containers.Indefinite_Hashed_Maps; use Ada.Containers;
+with Ada.Containers.Indefinite_Hashed_Maps;
 with Ada.Calendar;
 
-with Ada.text_io; use Ada.Text_IO;
-with Ada.Strings.Fixed; use Ada.Strings.Fixed;
+with Ada.text_io;
+with Ada.Strings.Fixed;
 
 with ib_ada.communication.outgoing;
-with ib_ada.conn;
+with ib_ada.connection;
 
+use Ada.Containers;
+use Ada.Text_IO;
+use Ada.Strings.Fixed;
 
 
 package body ib_ada.communication is
@@ -34,7 +37,6 @@ package body ib_ada.communication is
       end;
    end;
 
-
    function codes (elements: variadic_integer_array) return code_vector.vector is
       codes : code_vector.vector;
    begin
@@ -43,7 +45,6 @@ package body ib_ada.communication is
       end loop;
       return codes;
    end;
-
 
    function get_serialized_msg (msg : string) return string is
       header : string(1..4);
@@ -55,34 +56,7 @@ package body ib_ada.communication is
       return header & msg;
    end;
 
-   procedure handshake is
-      use ib_ada.communication.outgoing;
-      handshake_msg : req_type := (-1, +build_handshake_msg, true, handshake);
-      resp : resp_type;
-   begin
-      ib_ada.conn.client.send (handshake_msg, resp);
-   end;
-
-   procedure start_api is
-      use ib_ada.communication.outgoing;
-      start_api_msg : req_type := (-1, +build_start_api_msg, true, start_api);
-      resp : resp_type;
-   begin
-      ib_ada.conn.client.send (start_api_msg, resp);
-   end;
-
-   procedure accounts_summary (tag : tag_type) is
-      use ib_ada.communication.outgoing;
-      account_summary_msg : req_type := (-1, +build_accounts_summary_msg (tag), true, account_summary);
-      resp : resp_type;
-   begin
-      ib_ada.conn.client.send (account_summary_msg, resp);
-   end;
-
-   procedure positions is
-      use ib_ada.communication.outgoing;
-      positions_msg : req_type := (-1, +build_positions_msg, true, positions);
-      resp : resp_type;
+   procedure clear_accounts_content is
       account_id : unbounded_string;
    begin
       for account in accounts.iterate loop
@@ -91,8 +65,43 @@ package body ib_ada.communication is
          accounts(account_id).open_orders.clear;
          accounts(account_id).summaries.clear;
       end loop;
+   end;
 
-      ib_ada.conn.client.send (positions_msg, resp);
+   procedure handshake is
+      use ib_ada.communication.outgoing;
+      handshake_msg : req_type := (-1, +build_handshake_msg, true, handshake);
+      resp : resp_type;
+   begin
+      ib_ada.connection.client.send (handshake_msg, resp);
+   end;
+
+   procedure start_api is
+      use ib_ada.communication.outgoing;
+      start_api_msg : req_type := (-1, +build_start_api_msg, true, start_api);
+      resp : resp_type;
+   begin
+      ib_ada.connection.client.send (start_api_msg, resp);
+   end;
+
+   procedure accounts_summary (tag : tag_type) is
+      use ib_ada.communication.outgoing;
+      request_number : integer := unique_id.get_unique_id (next_valid_request_id);
+      account_summary_msg : req_type := (request_number , +build_accounts_summary_msg (request_number , tag), true, account_summary);
+      cancel_account_summary_msg : req_type := (request_number, +build_cancel_accounts_summary_msg (request_number), false, account_summary_cancel);
+      resp : resp_type;
+   begin
+      clear_accounts_content;
+      ib_ada.connection.client.send (account_summary_msg, resp);
+      ib_ada.connection.client.send (cancel_account_summary_msg, resp);
+   end;
+
+   procedure positions is
+      use ib_ada.communication.outgoing;
+      positions_msg : req_type := (-1, +build_positions_msg, true, positions);
+      resp : resp_type;
+   begin
+      clear_accounts_content;
+      ib_ada.connection.client.send (positions_msg, resp);
    end;
 
    procedure pnl (account_id : string; contract_id : integer) is
@@ -107,10 +116,10 @@ package body ib_ada.communication is
       cache_request.contract_id := contract_id;
       cached_requests.cache_request (request_number, cache_request);
 
-      ib_ada.conn.client.send (pnl_msg, resp);
+      ib_ada.connection.client.send (pnl_msg, resp);
 
       if resp.resp_id /= error then
-         ib_ada.conn.client.send (cancel_pnl, resp);
+         ib_ada.connection.client.send (cancel_pnl, resp);
       end if;
    end;
 
@@ -131,7 +140,7 @@ package body ib_ada.communication is
       for account in accounts.iterate loop
          account_id := account_map.key(account);
          for pos in accounts(account_id).positions.iterate loop
-            contract_id := position_map.Element(pos).contract.contract_id;
+            contract_id := position_map.element(pos).contract.contract_id;
             pnl_arguments.append ((account_id, contract_id));
          end loop;
       end loop;
@@ -155,7 +164,7 @@ package body ib_ada.communication is
          req_id := place_order;
       end if;
       place_order_msg := (request_number, +build_place_order_msg (request_number, contract, order), true, req_id);
-      ib_ada.conn.client.send (place_order_msg, resp);
+      ib_ada.connection.client.send (place_order_msg, resp);
       return request_number;
    end;
 
@@ -182,9 +191,7 @@ package body ib_ada.communication is
                                                          at_price_type  => at_price_type,
                                                          what_if        => true);
       request_number : integer := ib_ada.communication.place_order (contract, order);
-      --cache_request : commission_cached_request_type;
    begin
-      --cached_requests.cache_request (request_number, cache_request);
       return request_number;
    end;
 
@@ -193,24 +200,16 @@ package body ib_ada.communication is
       cancel_order_msg : req_type := (request_number, +build_cancel_order_msg (request_number), true, cancel_order);
       resp : resp_type;
    begin
-      ib_ada.conn.client.send (cancel_order_msg, resp);
+      ib_ada.connection.client.send (cancel_order_msg, resp);
    end;
 
    procedure open_orders is
       use ib_ada.communication.outgoing;
       open_orders_msg : req_type := (-1, +build_open_orders_msg, true, open_orders);
       resp : resp_type;
-      account_id : unbounded_string;
    begin
-
-      for account in accounts.iterate loop
-         account_id := account_map.key(account);
-         accounts(account_id).positions.clear;
-         accounts(account_id).open_orders.clear;
-         accounts(account_id).summaries.clear;
-      end loop;
-
-      ib_ada.conn.client.send (open_orders_msg, resp);
+      clear_accounts_content;
+      ib_ada.connection.client.send (open_orders_msg, resp);
    end;
 
    procedure market_data (symbol : string; contract_id : integer) is
@@ -227,7 +226,7 @@ package body ib_ada.communication is
       declare
          market_data_msg : req_type := (request_number, +build_market_data_msg (request_number, contract), true, market_data);
       begin
-         ib_ada.conn.client.send (market_data_msg, resp);
+         ib_ada.connection.client.send (market_data_msg, resp);
       end;
 
    end;
@@ -239,24 +238,4 @@ package body ib_ada.communication is
       return cache_request.commission;
    end;
 
-
-
 end ib_ada.communication;
-
-
-   --
-   --
-   --  protected body msg_queue_monitor is
-   --     procedure add_message_to_queue (msg : message_type) is
-   --     begin
-   --        msg_queue.prepend (msg);
-   --     end;
-   --
-   --     procedure consume_message_from_queue (msg : in out message_type) is
-   --     begin
-   --        if msg_queue.Length > 0 then
-   --           msg := msg_queue.last_element;
-   --           msg_queue.delete_last;
-   --        end if;
-   --     end;
-   --  end;

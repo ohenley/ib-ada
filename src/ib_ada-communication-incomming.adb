@@ -1,19 +1,21 @@
-with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Text_IO;
 With Ada.Text_IO.Unbounded_IO;
-with Ada.Characters.Handling; use  Ada.Characters.Handling;
+with Ada.Characters.Handling;
+with Ada.Strings.Fixed;
+with ib_ada.communication.outgoing;
 
-with Ada.Strings.Fixed; use Ada.Strings.Fixed;
-
-with ib_ada.communication.outgoing; --use ib_ada.communication.outgoing;
+use Ada.Text_IO;
+use Ada.Characters.Handling;
+use Ada.Strings.Fixed;
 
 
 package body ib_ada.communication.incomming is
+
    package suio renames Ada.Text_IO.Unbounded_IO;
 
    procedure print_msg_tokens (msg_tokens : msg_vector.vector) is
    begin
       for e of msg_tokens loop
-         --suio.Put ("*" & e);
          suio.Put (" " & e);
       end loop;
       new_line;
@@ -55,11 +57,34 @@ package body ib_ada.communication.incomming is
    function handle_managed_accounts_msg (req : req_type; msg_tokens : in out msg_vector.vector; msg_handler : msg_handler_type) return resp_type is
       new_account : act_type;
       resp : resp_type;
+
+      -- having to do this is just wrong
+      function extract_accounts (accounts_raw : string) return msg_vector.vector is
+         found_accounts : msg_vector.vector;
+         account : unbounded_string;
+      begin
+         for i in accounts_raw'first .. accounts_raw'last loop
+            if accounts_raw(i) = ',' and account /= "" then
+               found_accounts.append (account);
+               account := +"";
+            elsif i = accounts_raw'last then
+               append(account, accounts_raw(i));
+               found_accounts.append (account);
+            else
+               append(account, accounts_raw(i));
+            end if;
+         end loop;
+
+         return found_accounts;
+      end;
+
+      found_accounts : msg_vector.vector := extract_accounts (+msg_tokens.first_element);
    begin
       resp.and_listen := true;
       resp.resp_id := managed_accounts;
-      for e of msg_tokens loop
+      for e of found_accounts loop
          ib_ada.accounts.include (e, new_account);
+         put_line(+e);
       end loop;
       return resp;
    end;
@@ -87,7 +112,10 @@ package body ib_ada.communication.incomming is
             error : integer := integer'value(+msg_tokens (msg_tokens.first_index + 1));
          begin
             Put_Line(error'image);
-            if error = 200 or error = 412 then -- (200) symbol does not exists, (412) contract is not available for trading
+            if error = 200 or error = 412 or error = 321 then
+               -- (200) symbol does not exists,
+               -- (412) contract is not available for trading.
+               -- (321) the size value cannot be zero.
                resp.and_listen := false;
             else
                resp.and_listen := true;
@@ -106,9 +134,10 @@ package body ib_ada.communication.incomming is
 
    function handle_position_msg (req : req_type; msg_tokens : in out msg_vector.vector; msg_handler : msg_handler_type) return resp_type is
       resp : resp_type;
+      security : security_type := security_type'value (+msg_tokens (msg_tokens.first_index + 3));
    begin
 
-      if req.req_id = positions then
+      if req.req_id = positions and security = STK then
          declare
             account : unbounded_string := msg_tokens.first_element;
             quantity : integer := integer'value(+msg_tokens (msg_tokens.first_index + 9));
@@ -118,7 +147,7 @@ package body ib_ada.communication.incomming is
             if quantity > 0 then
                contract.contract_id := integer'value(+msg_tokens (msg_tokens.first_index + 1));
                contract.symbol := msg_tokens (msg_tokens.first_index + 2);
-               contract.security := security_type'value (+msg_tokens (msg_tokens.first_index + 3));
+               contract.security := security;
                contract.exchange := exchange_type'value (+msg_tokens (msg_tokens.first_index + 5));
                contract.currency := currency_type'value (+msg_tokens (msg_tokens.first_index + 6));
                position.contract := contract;
@@ -171,12 +200,11 @@ package body ib_ada.communication.incomming is
    function handle_pnl_single_msg (req : req_type; msg_tokens : in out msg_vector.vector; msg_handler : msg_handler_type) return resp_type is
       resp : resp_type;
       request_number : integer := integer'value(+msg_tokens (msg_tokens.first_index));
-      --quantity : integer := integer'value(+msg_tokens (msg_tokens.first_index + 1));
 
-      pnl_daily : safe_float := get_safe_float(+msg_tokens (msg_tokens.first_index + 2));
-      pnl_unrealized : safe_float := get_safe_float(+msg_tokens (msg_tokens.first_index + 3));
-      pnl_realized : safe_float := get_safe_float(+msg_tokens (msg_tokens.first_index + 4));
-      --current_value : safe_float := get_safe_float(+msg_tokens (msg_tokens.first_index + 5));
+      current_value : safe_float := get_safe_float(+msg_tokens (msg_tokens.first_index + 5));
+      -- f*** the rest as it cannot be relied upon. often you will receive this crap anyway:
+      -- <error> 331 2150 Invalid position trade derived value
+      -- and from the pnl message itself, only current total value is valid.
 
       cache_request : pnl_cached_request_type;
       account_id : unbounded_string;
@@ -188,9 +216,11 @@ package body ib_ada.communication.incomming is
          if +account_id = cache_request.account_id then
             for pos in accounts(account_id).positions.iterate loop
                if position_map.Element(pos).contract.contract_id = cache_request.contract_id then
-                  accounts(account_id).positions(pos).pnl_daily := pnl_daily;
-                  accounts(account_id).positions(pos).pnl_unrealized := pnl_unrealized;
-                  accounts(account_id).positions(pos).pnl_realized := pnl_realized;
+                  declare
+                     open_value : safe_float := accounts(account_id).positions(pos).average_cost * safe_float(accounts(account_id).positions(pos).quantity);
+                  begin
+                     accounts(account_id).positions(pos).pnl_unrealized := current_value - open_value;
+                  end;
                end if;
             end loop;
          end if;
@@ -214,8 +244,6 @@ package body ib_ada.communication.incomming is
       request_number : integer := integer'value(+msg_tokens (msg_tokens.first_index));
    begin
 
-      Put_Line(request_number'image);
-
       resp.and_listen := true;
 
       if req.req_id = open_orders then
@@ -224,10 +252,6 @@ package body ib_ada.communication.incomming is
          resp.resp_id := fake_order;
       end if;
 
-      --if request_number /= req.request_number then
-      --   return resp;
-      --end if;
-
       if req.req_id = open_orders then
          declare
             account_id : unbounded_string := msg_tokens (msg_tokens.first_index + 16);
@@ -235,8 +259,7 @@ package body ib_ada.communication.incomming is
             open_ord : open_order_type;
          begin
             open_ord.request_id := request_number;
-            --open_ord.status := order_status_value(+msg_tokens (msg_tokens.first_index + 52));
-            --
+
             open_ord.contract.contract_id := integer'value(+msg_tokens (msg_tokens.first_index + 1));
             open_ord.contract.symbol := symbol;
             open_ord.contract.security := security_type'value (+msg_tokens (msg_tokens.first_index + 3));
@@ -248,7 +271,7 @@ package body ib_ada.communication.incomming is
             open_ord.order.at_price_type :=  order_at_price_type'value(+msg_tokens (msg_tokens.first_index + 12));
             open_ord.order.time_in_force := time_in_force_type'value(+msg_tokens (msg_tokens.first_index + 15));
 
-            ib_ada.accounts(account_id).open_orders.include (symbol, open_ord);
+            ib_ada.accounts(account_id).open_orders.append (open_ord);
          end;
       elsif req.req_id = fake_order and request_number = req.request_number then
 
@@ -277,9 +300,6 @@ package body ib_ada.communication.incomming is
          return resp;
       end if;
 
-      if req.req_id = fake_order then
-         put_line ("received fake_order results");
-      end if;
       resp.and_listen := false;
 
       return resp;
@@ -354,8 +374,6 @@ package body ib_ada.communication.incomming is
          message_tokens.prepend(+"0");
       end if;
 
-      Put_Line("<-------- " & message_code & " -------->");
-
       if msg_definitions.contains (message_tokens.first_element) then
          declare
             msg_handler : msg_handler_type := msg_definitions (message_tokens.first_element);
@@ -377,26 +395,17 @@ package body ib_ada.communication.incomming is
 
 begin
 
-   msg_definitions.include (+"0", (server_infos, codes((1 => 0)), handle_session_datetime_msg'access));
-   msg_definitions.include (+"15", (managed_accounts, codes((1 => 15, 2 => 1)), handle_managed_accounts_msg'access));
-   msg_definitions.include (+"9", (next_valid_id, codes((1 => 9, 2 => 1)), handle_next_valid_id_msg'access));
-   msg_definitions.include (+"4", (error, codes((1 => 4, 2 => 2, 3 => -1)), handle_error_msg'access));
-   msg_definitions.include (+"61", (positions, codes((1 => 61,  2 => 3)), handle_position_msg'access));
-   msg_definitions.include (+"62", (positions_end, codes((1 => 62,  2 => 1)), handle_position_end_msg'access));
-   msg_definitions.include (+"63", (account_summary, codes((1 => 63, 2 => 1)), handle_account_summary_msg'access));
-   msg_definitions.include (+"64", (account_summary_end, codes((1 => 64, 2 => 1)), handle_account_summary_end_msg'access));
-   msg_definitions.include (+"95", (pnl_single, codes((1 => 95)), handle_pnl_single_msg'access));
-   msg_definitions.include (+"5", (open_order, codes((1 => 5)), handle_open_order_msg'access));
-   msg_definitions.include (+"3", (order_status, codes((1 => 3)), handle_order_status_msg'access));
-   msg_definitions.include (+"53", (open_orders_end, codes((1 => 53)), handle_open_orders_end_msg'access));
+   msg_definitions.include (+"0",  (server_infos,        codes((1 => 0)),                  handle_session_datetime_msg'access));
+   msg_definitions.include (+"15", (managed_accounts,    codes((1 => 15, 2 => 1)),         handle_managed_accounts_msg'access));
+   msg_definitions.include (+"9",  (next_valid_id,       codes((1 => 9, 2 => 1)),          handle_next_valid_id_msg'access));
+   msg_definitions.include (+"4",  (error,               codes((1 => 4, 2 => 2, 3 => -1)), handle_error_msg'access));
+   msg_definitions.include (+"61", (positions,           codes((1 => 61,  2 => 3)),        handle_position_msg'access));
+   msg_definitions.include (+"62", (positions_end,       codes((1 => 62,  2 => 1)),        handle_position_end_msg'access));
+   msg_definitions.include (+"63", (account_summary,     codes((1 => 63, 2 => 1)),         handle_account_summary_msg'access));
+   msg_definitions.include (+"64", (account_summary_end, codes((1 => 64, 2 => 1)),         handle_account_summary_end_msg'access));
+   msg_definitions.include (+"95", (pnl_single,          codes((1 => 95)),                 handle_pnl_single_msg'access));
+   msg_definitions.include (+"5",  (open_order,          codes((1 => 5)),                  handle_open_order_msg'access));
+   msg_definitions.include (+"3",  (order_status,        codes((1 => 3)),                  handle_order_status_msg'access));
+   msg_definitions.include (+"53", (open_orders_end,     codes((1 => 53)),                 handle_open_orders_end_msg'access));
 
 end ib_ada.communication.incomming;
-
-
-
---              for token of msg_tokens loop
---                 Put_Line (+token & " : " & counter'image);
---                 counter := counter + 1;
---              end loop;
-
-

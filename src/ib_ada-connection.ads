@@ -1,6 +1,8 @@
-with ib_ada.communication; use ib_ada.communication;
+with ib_ada.communication;
 
-package ib_ada.conn is
+use ib_ada.communication;
+
+package ib_ada.connection is
 
    task type socket_connection is
       entry setup (session : session_type);
@@ -10,4 +12,4 @@ package ib_ada.conn is
 
    client : socket_connection;
 
-end ib_ada.conn;
+end ib_ada.connection;

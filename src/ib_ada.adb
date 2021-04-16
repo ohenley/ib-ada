@@ -1,4 +1,6 @@
-with Ada.Characters.Handling; use Ada.Characters.Handling;
+with Ada.Characters.Handling;
+
+use Ada.Characters.Handling;
 
 package body ib_ada is
 
