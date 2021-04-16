@@ -97,7 +97,7 @@ Only works for stocks and provides a minimum viable interface to the TWS/IB Gate
 
 ## Usage
 Being library code, ib-ada is to be driven by another application. See [ib-rest](https://github.com/ohenley/ib-rest).
-This library interface is the calls exposed in ib_ada-communication.ads/adb. 
+This library intended interface resides in the calls exposed by ib_ada-communication.ads. 
 
 ## Acknowledgments
 - Thanks to @erdewit for his [ib_insync](https://github.com/erdewit/ib_insync) work which provided a sound 'reverse engineering map'.
