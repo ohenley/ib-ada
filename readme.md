@@ -53,8 +53,9 @@ Interactive Brokers (IB) TWS/IB Gateway communication engine written in Ada.
    3. Filter out much of the scope noise. (check build_place_order_msg (...) inside ib_ada-communication-outgoing.adb for fun. Now, you should see the version trying to be backward compatible. e.g. [ib_insync](https://github.com/erdewit/ib_insync) does it.)
   This is a design decision that also presents some drawbacks because TWS/IB Gateway went at length to break this communication model. I am musing about implementing a fully threaded asynchronous message pump but such design opens a whole new can of worms. 
 
-- If by any bad luck, the ib-ada TCP message pump (call then read) gets stuck, it is really because of a yet still unencountered 'messaging context/sequence' coming from TWS/IB Gateway. TWS/IB Gateway reuse 'message types' for answers in different client call contexts, sometimes pushing irrelevant ones, in a new order, and potentially with different occurrences. Also, TWS/IB Gateway is inconsistent in its make use of request ids (identifying client call and corresponding answer) and, like if it was not enough, often miss a high-level marker/message code identifying the complete end of a messages sequence for a particular client call. Do not get me wrong, it has such an 'end mechanism' for certain API calls but not all of them; because it also thinks it was a good idea to simultaneously be a streaming server on the same port and finally confused one responsibility to the other in modeling an API of clear intents. 
-By chance, every answer context sequences (coming from TWS/IB Gateway) are deterministic and unique so once we know what will come our way it is easy to 'encode' the receiving context behavior (see the use of req_type/resp_type used in combination throughout the different answer handlers. It might not be the cleaner way but it works well. So for the moment thats that). You just get surprised the first time. Open an issue if/when that happens or help me out by proposing a pull request.
+- If by any bad luck, the ib-ada TCP message pump (call then read) gets stuck, it is really because of a yet still unencountered 'messaging context/sequence' coming from TWS/IB Gateway. TWS/IB Gateway reuse 'message types' for answers in different client call contexts, sometimes pushing irrelevant ones, in a new order, and potentially with different occurrences. Also, TWS/IB Gateway is inconsistent in its make use of request ids (identifying client call and corresponding answer) and, like if it was not enough, often miss a high-level marker/message code identifying the complete end of a messages sequence for a particular client call. Do not get me wrong, it has such an 'end mechanism' for certain API calls but not all of them; because it also thinks it was a good idea to simultaneously be a streaming server on the same port and finally confused one responsibility to the other in modeling an API of clear intents.    
+
+- By chance, every answer context sequences (coming from TWS/IB Gateway) are, from observation, deterministic and unique so once we know what will come our way it is easy to 'encode' the receiving context behavior (see the use of req_type/resp_type used in combination throughout the different answer handlers. It might not be the cleaner way but it works well. So for the moment thats that). You just get surprised the first time. Open an issue if/when that happens or help me out by proposing a pull request.
 
 ## Prerequisites
 - Win32 or Linux platform (tested and working on Windows 10, Lubuntu 20.04.1)
@@ -96,7 +97,7 @@ Only works for stocks and provides a minimum viable interface to the TWS/IB Gate
 
 ## Usage
 Being library code, ib-ada is to be driven by another application. See [ib-rest](https://github.com/ohenley/ib-rest).
-This library interface is the calls exposed in ib_ada-communication.ads/adb. 
+This library intended interface resides in the calls exposed by ib_ada-communication.ads. 
 
 ## Acknowledgments
 - Thanks to @erdewit for his [ib_insync](https://github.com/erdewit/ib_insync) work which provided a sound 'reverse engineering map'.
