@@ -50,7 +50,7 @@ Interactive Brokers (IB) TWS/IB Gateway communication engine written in Ada.
 - This version of ib-ada adapts the IB TWS/IB Gateway 'mixed' communication model ('client-server' + 'streams' + 'message semantic context dependent') to an orthodox client-server model for three main reasons. 
    1. To keep things synchronized as a first step/implementation.
    2. Filter out much of the scope noise. (check `build_place_order_msg (...)` inside `ib_ada-communication-outgoing.adb` for fun. Now, you should see the version trying to be backward compatible. e.g. [ib_insync](https://github.com/erdewit/ib_insync) does it.)
-   3. Ease of client use.
+   3. Ease of use for client's code.
    
 - This is a design decision that also presents some drawbacks because TWS/IB Gateway went at length to break this communication model. I am musing about implementing a fully threaded asynchronous message pump but such design opens a whole new can of worms. Ada would be the perfect fit though.
 
