@@ -98,7 +98,7 @@ Only works for stocks and provides a minimum viable interface to the TWS/IB Gate
 - market data (warning: rudimentary and untested)
 
 ## Usage
-Being library code, ib-ada is to be driven by another application. See [ib-rest](https://github.com/ohenley/ib-rest).
+Being library code, ib-ada is meant to be driven by another application. See [ib-rest](https://github.com/ohenley/ib-rest).
 This library intended interface resides in the calls exposed by ib_ada-communication.ads. 
 
 ## Acknowledgments
