@@ -59,8 +59,8 @@ Interactive Brokers (IB) TWS/IB Gateway communication engine written in Ada.
 
 ## Prerequisites
 - An activated Interactive Brokers (IB) account.
-- [TWS](https://www.interactivebrokers.ca/en/index.php?f=16040) or [IB Gateway](https://www.interactivebrokers.ca/en/index.php?f=16457) running and serving to standard defined IB ports. (or consult `ib_ada.ads` and adapt preconfigured standard ones) 
 - Win32 or Linux platform (tested and working on Windows 10, Lubuntu 20.04.1)
+- [TWS](https://www.interactivebrokers.ca/en/index.php?f=16040) or [IB Gateway](https://www.interactivebrokers.ca/en/index.php?f=16457)
 - GNAT (tested and working with GNAT community 2020, GNAT FSF 9.3.0)
 
 ## Dependencies
