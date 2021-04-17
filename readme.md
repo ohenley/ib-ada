@@ -50,8 +50,9 @@ Interactive Brokers (IB) TWS/IB Gateway communication engine written in Ada.
 - This version of ib-ada adapts the IB TWS/IB Gateway 'mixed' communication model ('client-server' + 'streams' + 'message semantic context dependent') to an orthodox client-server model for three main reasons. 
    1. To keep things synchronized as a first step/implementation.
    2. Filter out much of the scope noise. (check `build_place_order_msg (...)` inside `ib_ada-communication-outgoing.adb` for fun. Now, you should see the version trying to be backward compatible. e.g. [ib_insync](https://github.com/erdewit/ib_insync) does it.)
-  This is a design decision that also presents some drawbacks because TWS/IB Gateway went at length to break this communication model. I am musing about implementing a fully threaded asynchronous message pump but such design opens a whole new can of worms.
-  3. Ease of client use.
+   3. Ease of client use.
+   
+- This is a design decision that also presents some drawbacks because TWS/IB Gateway went at length to break this communication model. I am musing about implementing a fully threaded asynchronous message pump but such design opens a whole new can of worms. Ada would be the perfect fit though.
 
 - If by any bad luck, the ib-ada TCP message pump (call then read) gets stuck, it is really because of a yet still unencountered 'messaging context/sequence' coming from TWS/IB Gateway. TWS/IB Gateway reuse 'message types' for answers in different client call contexts, sometimes pushing irrelevant ones, in a new order, and potentially with different occurrences. Also, TWS/IB Gateway is inconsistent in its make use of request ids (identifying client call and corresponding answer) and, like if it was not enough, often miss a high-level marker/message code identifying the complete end of a messages sequence for a particular client call. Do not get me wrong, it has such an 'end mechanism' for certain API calls but not all of them; because it also thinks it was a good idea to simultaneously be a streaming server on the same port and finally confused one responsibility to the other in modeling an API of clear intents.    
 
