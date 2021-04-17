@@ -37,9 +37,9 @@ Interactive Brokers (IB) TWS/IB Gateway communication engine written in Ada.
 - For the time being, as a Canadian, my only API choice without resorting to opening a US corporation is to use Interactive Brokers.
 
 ## Status
-- First. This library should work out of the box as I am using it daily. My experience is that it is debugged and quite robust as-is. I take the time to mention it because if you did not know yet, few open source pet projects repository actually builds/works. You can dig a lot of time trying John Doe(s) projects to realize you are still left cold. I am just trying to save you time, something nobody did for me while getting acquainted with the 'IB retail stack'.
+- First. This library should work out of the box as I am using it daily. My experience is that it is debugged and quite robust as-is. I take the time to mention it because if you did not know yet, few open source pet projects repository actually builds/works. You can burn a lot of time trying John Doe(s) projects to realize you are still left cold. I am just trying to save you time, something nobody did for me while getting acquainted with the 'IB retail stack'.
 
-- Supports only stocks (STK) related operations of USD and CAD currencies. My needs. See [Limitations](#Limitations) section for more details. Expanding to different security types, currencies, etc. should be quite easy. At the moment I lack time, incentives and prefer to keep this project lean. I plan to add new features as they become needed. Why? Because the full IB scope is, in my opinion, dubious. 
+- Supports only stocks (STK) related operations of USD currency. My needs. See [Limitations](#Limitations) section for more details. Expanding to different security types, currencies, etc. should be quite easy. At the moment I lack time, incentives and prefer to keep this project lean. I plan to add new features as they become needed. Why? Because the full IB scope is, in my opinion, dubious. 
 
 - Supports only TWS/IB Gateway v978+ and server 152+.
 
