@@ -26,7 +26,7 @@ Interactive Brokers (IB) TWS/IB Gateway communication engine written in Ada.
 ## About
 - ib-ada is a 'semi-thick' TCP message-based communication library (client) to the TWS or IB Gateway (server) written in the Ada programming language.
 
-- I started this project because every other 'equivalent' implementation I tested did not work properly, for one reason or another, ... and I tried most of them all (C++, C#, Python, JS, official and third-party. I gave up before installing a whole Java developer environment just to test if, maybe, this time the outcome would be different).
+- I started this project because every other 'equivalent' implementation I tested did not work properly, for one reason or another, ... and I tried most of them all (C++, C#, Python, JS, official and third-party. I gave up at the idea of installing a whole Java developer environment just to test if, maybe, this time the outcome would be different).
 
 - I hold a certain grudge against Interactive Brokers for misleading advertising about their technology offer. I paid the price of such a painful discovery through hundred hours of research, testing, dead-end, and headaches. This library is a conservative, explicit, sandboxed, progressive, simple, and hopefully sane response to this reality. 
 
