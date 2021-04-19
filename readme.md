@@ -24,6 +24,8 @@ Interactive Brokers (IB) TWS/IB Gateway communication engine written in Ada.
 
 - I started this project because every other 'equivalent' implementation I tested did not work for my use case, for one reason or another, ... and I tried most of them all (C++, C#, Python, JS, official and third-party. I gave up at the idea of installing a whole Java developer environment just to test if, maybe, this time the outcome would be different).
 
+- Most people will be interested to access ib-ada functionalities through [ib-rest](https://github.com/ohenley/ib-rest).
+
 ## Status
 - First. This library should work out of the box as I am using it daily. My experience is that it is debugged and quite robust as-is. 
 
