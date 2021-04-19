@@ -1,10 +1,6 @@
 # ib-ada
 Interactive Brokers (IB) TWS/IB Gateway communication engine written in Ada.
 
-> The bitterness of poor quality remains long after the sweetness of low price is forgotten.
->
-> -- <cite>Benjamin Franklin</cite>
-
 ## Table of Contents
 <details>
 <summary>Click to expand</summary>
