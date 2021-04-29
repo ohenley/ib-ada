@@ -56,15 +56,11 @@ package body ib_ada.connection is
             accept setup (session : session_type) do
                gnat.sockets.initialize;
                create_socket (client);
-
                set_socket_option (client, socket_level, (reuse_address, true));
-
                address.addr := inet_addr ("127.0.0.1");
                address.port := ports (session);
-
                connect_socket (client, address);
                channel := stream (client);
-
             end setup;
          or
             accept disconnect;
@@ -97,9 +93,7 @@ package body ib_ada.connection is
                               end loop;
                               resp := ib_ada.communication.incomming.handle_message (req, server_msg);
                            end;
-
                            exit when not resp.and_listen;
-
                         end loop;
                      end if;
                   end if;
