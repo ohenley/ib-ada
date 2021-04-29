@@ -81,7 +81,10 @@ package body ib_ada.connection is
                      if req.and_listen then                                       -- and listen..?
                         loop                                                      -- read server messages until a handler says its over
                            string'read(channel, msg_header);                      -- read header
-                           msg_header_swap := (msg_header(msg_header'last), msg_header(msg_header'last-1), msg_header(msg_header'last-2), msg_header(msg_header'last-3));
+                           msg_header_swap := (msg_header(msg_header'last), 
+                                               msg_header(msg_header'last-1), 
+                                               msg_header(msg_header'last-2), 
+                                               msg_header(msg_header'last-3));
                            msg_length := to_length (msg_header_swap);
                            declare
                               msg_buffer     : stream_element_array (1 .. ada.streams.stream_element_offset(msg_length));
