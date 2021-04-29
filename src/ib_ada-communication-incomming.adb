@@ -324,6 +324,7 @@ package body ib_ada.communication.incomming is
    begin
       resp.resp_id := order_status;
       resp.and_listen := true;
+      resp.req_number := request_number;
 
       if request_number /= req.request_number then
          return resp;
