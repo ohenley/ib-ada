@@ -70,44 +70,49 @@ package body ib_ada.communication is
       end loop;
    end;
 
-   procedure handshake is
+   function handshake return resp_type is
       use ib_ada.communication.outgoing;
       handshake_msg : req_type := (-1, +build_handshake_msg, true, handshake);
       resp          : resp_type;
    begin
       ib_ada.connection.client.send(handshake_msg, resp);
+      return resp;
    end;
 
-   procedure start_api is
+   function start_api return resp_type is
       use ib_ada.communication.outgoing;
       start_api_msg : req_type := (-1, +build_start_api_msg, true, start_api);
       resp          : resp_type;
    begin
       ib_ada.connection.client.send(start_api_msg, resp);
+      return resp;
    end;
 
-   procedure accounts_summary (tag : tag_type) is
+   function accounts_summary (tag : tag_type) return resp_type is
       use ib_ada.communication.outgoing;
       request_number             : integer  := unique_id.get_unique_id(next_valid_request_id);
       account_summary_msg        : req_type := (request_number , +build_accounts_summary_msg(request_number , tag), true, account_summary);
       cancel_account_summary_msg : req_type := (request_number, +build_cancel_accounts_summary_msg(request_number), false, account_summary_cancel);
       resp                       : resp_type;
    begin
+      resp.req_number := request_number;
       clear_accounts_content;
       ib_ada.connection.client.send(account_summary_msg, resp);
       ib_ada.connection.client.send(cancel_account_summary_msg, resp);
+      return resp;
    end;
 
-   procedure positions is
+   function positions return resp_type is
       use ib_ada.communication.outgoing;
       positions_msg : req_type := (-1, +build_positions_msg, true, positions);
       resp          : resp_type;
    begin
       clear_accounts_content;
       ib_ada.connection.client.send(positions_msg, resp);
+      return resp;
    end;
 
-   procedure profit_and_loss (account_id : string; contract_id : integer) is
+   function profit_and_loss (account_id : string; contract_id : integer) return resp_type is
       use ib_ada.communication.outgoing;
       request_number         : integer  := unique_id.get_unique_id(next_valid_request_id);
       profit_and_loss_msg    : req_type := (request_number, +build_profit_and_loss_msg(request_number, account_id, contract_id), true, profit_and_loss_single);
@@ -115,18 +120,21 @@ package body ib_ada.communication is
       resp                   : resp_type;
       cache_request          : profit_and_loss_cached_request_type;
    begin
+      resp.req_number := request_number;
       cache_request.account_id := +account_id;
       cache_request.contract_id := contract_id;
       cached_requests.cache_request (request_number, cache_request);
 
       ib_ada.connection.client.send(profit_and_loss_msg, resp);
 
-      if resp.resp_id /= error then
+      if resp.resp_id /= status then
          ib_ada.connection.client.send(cancel_profit_and_loss, resp);
       end if;
+
+      return resp;
    end;
 
-   procedure profits_and_losses is
+   function profits_and_losses return resp_type is
       use ib_ada.communication.outgoing;
 
       type profit_and_loss_argument is
@@ -139,6 +147,7 @@ package body ib_ada.communication is
       profit_and_loss_arguments : profit_and_loss_argument_vector.vector;
       account_id    : unbounded_string;
       contract_id   : integer;
+      resp          : resp_type;
    begin
       for account in accounts.iterate loop
          account_id := account_map.key(account);
@@ -149,18 +158,23 @@ package body ib_ada.communication is
       end loop;
 
       for argument of profit_and_loss_arguments loop
-         profit_and_loss(+argument.account_id, argument.contract_id);
+         resp := profit_and_loss(+argument.account_id, argument.contract_id);
       end loop;
+
+      resp.resp_id := profits_and_losses;
+      return resp;
    end;
 
 
-   function place_order (contract : contract_type; order : order_type) return integer is
+   function place_order (contract : contract_type; order : order_type) return resp_type is
       use ib_ada.communication.outgoing;
       request_number  : integer := unique_id.get_unique_id(next_valid_request_id);
       place_order_msg : req_type;
       req_id          : req_id_type;
       resp            : resp_type;
    begin
+      resp.req_number := request_number;
+
       if order.what_if then
          req_id := fake_order;
       else
@@ -168,40 +182,43 @@ package body ib_ada.communication is
       end if;
       place_order_msg := (request_number, +build_place_order_msg(request_number, contract, order), true, req_id);
       ib_ada.connection.client.send(place_order_msg, resp);
-      return request_number;
+
+      return resp;
    end;
 
-   function place_order (side: order_side_type; symbol : string; quantity : integer; at_price_type : order_at_price_type) return integer is
+   function place_order (side: order_side_type; symbol : string; quantity : integer; at_price_type : order_at_price_type) return resp_type is
       contract       : ib_ada.contract_type := ib_ada.prepare_contract(symbol, ib_ada.STK, ib_ada.USD, ib_ada.SMART);
       order          : ib_ada.order_type    := ib_ada.prepare_order(side, quantity, at_price_type);
-      request_number : integer              := ib_ada.communication.place_order(contract, order);
+      resp           : resp_type            := ib_ada.communication.place_order(contract, order);
    begin
-      return request_number;
+      return resp;
    end;
 
-   function place_fake_order (side: order_side_type; symbol : string; quantity : integer; at_price_type : order_at_price_type) return integer is
+   function place_fake_order (side: order_side_type; symbol : string; quantity : integer; at_price_type : order_at_price_type) return resp_type is
       contract       : ib_ada.contract_type := ib_ada.prepare_contract(symbol, ib_ada.STK, ib_ada.USD, ib_ada.SMART);
       order          : ib_ada.order_type    := ib_ada.prepare_order(side, quantity, at_price_type, what_if => true);
-      request_number : integer              := ib_ada.communication.place_order(contract, order);
+      resp           : resp_type            := ib_ada.communication.place_order(contract, order);
    begin
-      return request_number;
+      return resp;
    end;
 
-   procedure cancel_order (request_number : integer) is
+   function cancel_order (request_number : integer) return resp_type is
       use ib_ada.communication.outgoing;
       cancel_order_msg : req_type := (request_number, +build_cancel_order_msg(request_number), true, cancel_order);
       resp             : resp_type;
    begin
       ib_ada.connection.client.send(cancel_order_msg, resp);
+      return resp;
    end;
 
-   procedure open_orders is
+   function open_orders return resp_type is
       use ib_ada.communication.outgoing;
       open_orders_msg : req_type := (-1, +build_open_orders_msg, true, open_orders);
       resp            : resp_type;
    begin
       clear_accounts_content;
       ib_ada.connection.client.send(open_orders_msg, resp);
+      return resp;
    end;
 
    function get_commission (request_number : integer) return safe_float is
@@ -212,12 +229,13 @@ package body ib_ada.communication is
    end;
 
    -- [wip] cannot test, because I am not subscribed.
-   procedure market_data (symbol : string; contract_id : integer) is
+   function market_data (symbol : string; contract_id : integer) return resp_type is
       use ib_ada.communication.outgoing;
       request_number : integer := unique_id.get_unique_id(next_valid_request_id);
       contract       : contract_type;
       resp           : resp_type;
    begin
+      resp.req_number := request_number;
       contract.contract_id := contract_id;
       contract.symbol      := +symbol;
       contract.security    := STK;
@@ -228,6 +246,7 @@ package body ib_ada.communication is
       begin
          ib_ada.connection.client.send(market_data_msg, resp);
       end;
+      return resp;
    end;
 
 end ib_ada.communication;

@@ -210,7 +210,7 @@ package body ib_ada.communication.outgoing is
    package integer_io is new ada.direct_io(integer);
 
    protected body unique_id is
-      function get_unique_id (next_valid_id : integer) return integer is
+      function get_unique_id (next_valid_req_number : integer) return integer is
          use integer_io;
          use ada.directories;
          i         : integer_io.File_Type;
@@ -235,11 +235,11 @@ package body ib_ada.communication.outgoing is
 
             db_id := db_id + 1;
 
-            if db_id >= next_valid_id then
+            if db_id >= next_valid_req_number then
                return db_id;
             end if;
 
-            return next_valid_id;
+            return next_valid_req_number;
          end;
 
          procedure persist_id (db_id : integer) is

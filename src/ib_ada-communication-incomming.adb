@@ -104,16 +104,16 @@ package body ib_ada.communication.incomming is
       return resp;
    end;
 
-   function handle_next_valid_id_msg (req : req_type; msg_tokens : in out msg_vector.vector; msg_handler : msg_handler_type) return resp_type is
+   function handle_next_valid_req_number_msg (req : req_type; msg_tokens : in out msg_vector.vector; msg_handler : msg_handler_type) return resp_type is
       resp : resp_type;
    begin
       resp.and_listen := true;
-      resp.resp_id := next_valid_id;
+      resp.resp_id := next_valid_req_number;
       ib_ada.next_valid_request_id := integer'value(+msg_tokens.first_element);
       return resp;
    end;
 
-   function handle_error_msg (req : req_type; msg_tokens : in out msg_vector.vector; msg_handler : msg_handler_type) return resp_type is
+   function handle_status_msg (req : req_type; msg_tokens : in out msg_vector.vector; msg_handler : msg_handler_type) return resp_type is
       resp : resp_type;
    begin
       if req.req_id = start_api then
@@ -124,9 +124,9 @@ package body ib_ada.communication.incomming is
          resp.and_listen := true;
       elsif req.req_id = place_order or req.req_id = fake_order then
          declare
-            error : integer := integer'value(+msg_tokens (msg_tokens.first_index + 1));
+            status : integer := integer'value(+msg_tokens (msg_tokens.first_index + 1));
          begin
-            if error = 200 or error = 412 or error = 321 then
+            if status = 200 or status = 412 or status = 321 then
                -- (200) symbol does not exists.
                -- (412) contract is not available for trading.
                -- (321) the size value cannot be zero.
@@ -143,7 +143,7 @@ package body ib_ada.communication.incomming is
       else
          resp.and_listen := true;
       end if;
-      resp.resp_id := error;
+      resp.resp_id := status;
       return resp;
    end;
 
@@ -217,7 +217,7 @@ package body ib_ada.communication.incomming is
       request_number : integer := integer'value(+msg_tokens(msg_tokens.first_index));
       current_value  : safe_float := get_safe_float(+msg_tokens(msg_tokens.first_index + 5));
       -- f*** the rest as it cannot be relied upon. often you will receive this crap anyway:
-      -- <error> 331 2150 invalid position trade derived value
+      -- <status> 331 2150 invalid position trade derived value
       -- and from the p&l message itself, only current total value is valid.
       cache_request  : profit_and_loss_cached_request_type;
       account_id     : unbounded_string;
@@ -419,8 +419,8 @@ begin
 
    msg_definitions.include(+"0",  (server_infos,           codes((1 => 0)),                  handle_session_datetime_msg'access));
    msg_definitions.include(+"15", (managed_accounts,       codes((1 => 15, 2 => 1)),         handle_managed_accounts_msg'access));
-   msg_definitions.include(+"9",  (next_valid_id,          codes((1 => 9, 2 => 1)),          handle_next_valid_id_msg'access));
-   msg_definitions.include(+"4",  (error,                  codes((1 => 4, 2 => 2, 3 => -1)), handle_error_msg'access));
+   msg_definitions.include(+"9",  (next_valid_req_number,          codes((1 => 9, 2 => 1)),          handle_next_valid_req_number_msg'access));
+   msg_definitions.include(+"4",  (status,                  codes((1 => 4, 2 => 2, 3 => -1)), handle_status_msg'access));
    msg_definitions.include(+"61", (positions,              codes((1 => 61,  2 => 3)),        handle_position_msg'access));
    msg_definitions.include(+"62", (positions_end,          codes((1 => 62,  2 => 1)),        handle_position_end_msg'access));
    msg_definitions.include(+"63", (account_summary,        codes((1 => 63, 2 => 1)),         handle_account_summary_msg'access));

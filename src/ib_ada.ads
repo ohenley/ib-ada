@@ -42,7 +42,7 @@ package ib_ada is
    type multiplier_type          is (OPTIONS, FUTURES, UNDEFINED);
 
    -- exchange list @ https://www.interactivebrokers.ca/en/index.php?f=1562
-   type exchange_type            is (SMART, NASDAQ, NYSE, AMEX, IDEALPRO, ONE, GLOBEX, CBOE, UNDEFINED);
+   type exchange_type            is (SMART, NASDAQ, NYSE, ARCA, AMEX, IDEALPRO, ONE, GLOBEX, CBOE, UNDEFINED);
    type currency_type            is (USD, CAD, UNDEFINED);
    type trading_class_type       is (NMS, SCM, UNDEFINED);
 

@@ -47,13 +47,14 @@ package ib_ada.communication is
    type resp_id_type is
      (server_infos,
       managed_accounts,
-      next_valid_id,
-      error,
+      next_valid_req_number,
+      status,
       positions,
       positions_end,
       account_summary,
       account_summary_end,
       profit_and_loss_single,
+      profits_and_losses,
       cancel_order,
       open_order,
       order_status,
@@ -65,6 +66,8 @@ package ib_ada.communication is
       record
          and_listen : boolean;
          resp_id    : resp_id_type;
+         req_number : integer := 0;
+         message    : unbounded_string := +"";
       end record;
 
 
@@ -95,21 +98,21 @@ package ib_ada.communication is
       cached_requests : cached_request_map.map;
    end;
 
-   procedure handshake;
-   procedure start_api;
-   procedure accounts_summary (tag : tag_type);
-   procedure positions;
-   procedure profit_and_loss (account_id : string; contract_id : integer);
-   procedure profits_and_losses;
-   function place_order (contract : contract_type; order : order_type) return integer;
-   function place_order (side: order_side_type; symbol : string; quantity : integer; at_price_type : order_at_price_type) return integer;
-   function place_fake_order (side: order_side_type; symbol : string; quantity : integer; at_price_type : order_at_price_type) return integer;
-   procedure cancel_order (request_number : integer);
-   procedure open_orders;
+   function handshake return resp_type;
+   function start_api return resp_type;
+   function accounts_summary (tag : tag_type) return resp_type;
+   function positions return resp_type;
+   function profit_and_loss (account_id : string; contract_id : integer) return resp_type;
+   function profits_and_losses return resp_type;
+   function place_order (contract : contract_type; order : order_type) return resp_type;
+   function place_order (side: order_side_type; symbol : string; quantity : integer; at_price_type : order_at_price_type) return resp_type;
+   function place_fake_order (side: order_side_type; symbol : string; quantity : integer; at_price_type : order_at_price_type) return resp_type;
+   function cancel_order (request_number : integer) return resp_type;
+   function open_orders return resp_type;
    function get_commission (request_number : integer) return safe_float;
 
    -- [wip] cannot test, because I am not subscribed.
-   procedure market_data (symbol : string; contract_id : integer);
+   function market_data (symbol : string; contract_id : integer) return resp_type;
 
 end ib_ada.communication;
 

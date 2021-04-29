@@ -17,7 +17,7 @@
 package ib_ada.communication.outgoing is
 
    protected unique_id is
-      function get_unique_id (next_valid_id : integer) return integer;
+      function get_unique_id (next_valid_req_number : integer) return integer;
    end;
 
    function build_handshake_msg return string;
