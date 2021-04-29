@@ -35,7 +35,7 @@ Interactive Brokers (IB) TWS/IB Gateway communication engine written in Ada.
 
 - ib-ada adapts the IB TWS/IB Gateway 'mixed' communication model (request/response + 'request/subscription stream') to an orthodox request/response model for three main reasons. 
    1. To keep things synchronized as a first step/implementation.
-   2. Filter out much of the scope noise. (check `build_place_order_msg (...)` inside `ib_ada-communication-outgoing.adb` for fun. Now, you should see the version trying to be backward compatible. e.g. [ib_insync](https://github.com/erdewit/ib_insync) does it.)
+   2. Filter out much of the scope noise. (check [`build_place_order_msg (...)`](https://github.com/ohenley/ib-ada/blob/main/src/ib_ada-communication-outgoing.adb#L330-L571) inside `ib_ada-communication-outgoing.adb` for fun. Now, you should see the version trying to be backward compatible. e.g. [ib_insync](https://github.com/erdewit/ib_insync) does it.)
    3. Ease of use for client's code.
    
 - This is a design decision that also presents some drawbacks because, like said before, TWS/IB Gateway shares its information using a simple message protocol but organized through different means (eg. open_orders are request/answer and profit_and_loss are request/subscription stream). Therefore some manipulations are done by ib-ada to 'close' everything as request/answer (eg. following a profit_and_loss request, a first received profit_and_loss data unit is automatically followed by an unsubscribe request to stop further incomming async profit_and_loss data units. This is transparent outside ib-ada and works very well actually) I am musing about implementing a fully threaded asynchronous message pump but such design opens a whole new can of worms. Ada would be the perfect fit though.
@@ -95,7 +95,7 @@ Only works for stocks and provides a minimum viable interface to the TWS/IB Gate
 
 ## Usage
 - Being library code, ib-ada is meant to be driven by another application. See [ib-rest](https://github.com/ohenley/ib-rest).
-- This library intended interface resides in the calls exposed by `ib_ada-communication.ads`. 
+- This library intended interface resides in the calls exposed by [`ib_ada-communication.ads`](https://github.com/ohenley/ib-ada/blob/main/src/ib_ada-communication.ads#L101-L115). 
 - In all cases, you can test those directly through a test executable:
 ```
 $ cd tests
