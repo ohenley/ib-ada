@@ -11,7 +11,7 @@ Interactive Brokers (IB) TWS/IB Gateway communication engine written in Ada.
 4. [Dependencies](#Dependencies)
 5. [Building](#Building)
    1. [Windows](#Windows)
-   2. [Other OSes](#Other-OSes)
+   2. [Linux](#Linux)
 6. [Installation](#Installation)
 7. [Limitations](#Limitations)
 8. [Usage](#Usage)
@@ -66,7 +66,8 @@ $ cd ib-ada
 $ gprbuild ib_ada.gpr
 ```
    
-#### Linux (ubuntu 20.04.1+ flavors)
+#### Linux
+Tested on ubuntu 20.04.1+ flavors.
 ```
 $ sudo apt-get install gnat-gps
 $ git clone https://github.com/ohenley/ib-ada.git
