@@ -81,20 +81,24 @@ Not Applicable.
 Only works for stocks and provides a minimum viable interface to the TWS/IB Gateway for a typical trading bot. Complete but no fancy, namely:
 
 - accounts information (account ids and different balance types)
-- positions
-- profit and loss for positions
-- open orders
+- positions (with-profits)
+- commission
 - place orders
-- potential order commission (through fake place orders)
+- cancel_orders
+- open orders
 - market data (warning: rudimentary and untested)
 
 ## Usage
 - Being library code, ib-ada is meant to be driven by another application. See [ib-rest](https://github.com/ohenley/ib-rest).
 - This library intended interface resides in the calls exposed by `ib_ada-communication.ads`. 
-- You can test those:
+- In all cases, you can test those directly through a test executable:
 ```
 $ cd tests
 $ gprbuild tests.gpr
+```
+- Start TWS or IB Gateway.
+```
+$ ./bin/test
 ```
 
 ## Acknowledgments
