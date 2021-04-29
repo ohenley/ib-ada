@@ -94,8 +94,6 @@ package body ib_ada is
       return order_status_type'value(+order_status_image);
    end;
 
-
-
    function prepare_contract (symbol   : string;
                               security : security_type;
                               currency : currency_type;
