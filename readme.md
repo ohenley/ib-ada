@@ -51,10 +51,12 @@ Interactive Brokers (IB) TWS/IB Gateway communication engine written in Ada.
 - This library is not, per se, properly sealed in terms of the highest theoretical standards. Also, some internal components are not reusable even if they could be candidates. Because I work on this through spare time, this is on purpose for now, to help move fast, refactor on the go as I 'reverse discovered' different implementation requirements, keep accessibility simple, and complexity down. I am aligned with the practice of 'semantic compression' as illustrated by Casey Muratori's mantra: [“make your code usable before you try to make it reusable”](https://caseymuratori.com/blog_0015).
 
 ## Prerequisites
-- An activated Interactive Brokers (IB) account.
-- Win32 or Linux platform (tested and working on Windows 10, Lubuntu 20.04.1)
-- [TWS](https://www.interactivebrokers.ca/en/index.php?f=16040) or [IB Gateway](https://www.interactivebrokers.ca/en/index.php?f=16457)
-- GNAT (tested and working with GNAT community 2020, GNAT FSF 9.3.0)
+- compilation:
+   - GNAT (tested and working with GNAT community 2020, GNAT FSF 9.3.0)
+- runtime:
+   - An activated Interactive Brokers (IB) account. I recommend a 'paper' account (fake account) at first.
+   - Win32 or Linux platform (tested and working on Windows 10, Lubuntu 20.04.1).
+   - [TWS](https://www.interactivebrokers.ca/en/index.php?f=16040) or [IB Gateway](https://www.interactivebrokers.ca/en/index.php?f=16457).
 
 ## Dependencies
 - none
@@ -87,8 +89,8 @@ Only works for stocks and provides a minimum viable interface to the TWS/IB Gate
 - positions (with-profits)
 - commission
 - place orders
-- cancel_orders
 - open orders
+- cancel_orders
 - market data (warning: rudimentary and untested)
 
 ## Usage
