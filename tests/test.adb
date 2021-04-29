@@ -1,38 +1,50 @@
 with Ada.text_io; use Ada.Text_IO;
 
 with ib_ada;
-with ib_ada.conn;
+with ib_ada.connection;
 with ib_ada.communication;
 
 
 procedure test is
-
-   request_id : integer;
-
+   resp : ib_ada.communication.resp_type;
+   use ib_ada;
 begin
 
-   ib_ada.conn.client.setup(ib_ada.IB_PAPER);
+   ib_ada.connection.client.setup(ib_ada.IB_PAPER);
 
-   ib_ada.communication.handshake;
-   ib_ada.communication.start_api;
+   resp := ib_ada.communication.handshake;
+   put_line(+resp.message);
 
-   --  ib_ada.communication.pnl ("DU3689337", 265598); -- AAPL
-   --  ib_ada.communication.account_summary (ib_ada.BUYING_POWER);
-   --  ib_ada.communication.positions;
-   --
-   --  request_id := ib_ada.communication.buy_order ("QS", 10, ib_ada.MIDPRICE);
-   --
-   ib_ada.communication.open_orders;
+   resp := ib_ada.communication.start_api;
+   put_line(+resp.message);
 
-   --ib_ada.communication.cancel_order (278);
-   --ib_ada.communication.cancel_order (275);
-   --ib_ada.communication.cancel_order (284);
+   resp := ib_ada.communication.accounts_summary (ib_ada.BUYING_POWER);
+   put_line(+resp.message);
 
-   --ib_ada.communication.cancel_order (request_id);
+   resp := ib_ada.communication.positions;
+   put_line(+resp.message);
 
+   resp := ib_ada.communication.profits_and_losses;
+   put_line(+resp.message);
 
-   --ib_ada.comminucation.sell ("AAPL", 10, ib_ada.MKT);
+--     resp := ib_ada.communication.place_order (side          => BUY,
+--                                               symbol        => "IBM",
+--                                               quantity      => 10,
+--                                               at_price_type => MKT);
+--     put_line(+resp.message);
 
-   ib_ada.conn.client.disconnect;
+--     resp := ib_ada.communication.cancel_order (resp.req_number);
+--     put_line(+resp.message);
+--
+--     resp := ib_ada.communication.open_orders;
+--     put_line(+resp.message);
+
+--     resp := ib_ada.communication.place_order (side          => SELL,
+--                                               symbol        => "IBM",
+--                                               quantity      => 10,
+--                                               at_price_type => MKT);
+--     put_line(+resp.message);
+
+   ib_ada.connection.client.disconnect;
 
 end test;
