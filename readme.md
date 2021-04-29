@@ -20,7 +20,7 @@ Interactive Brokers (IB) TWS/IB Gateway communication engine written in Ada.
 </details>
 
 ## About
-- ib-ada is a 'semi-thick' TCP message-based request/response communication library (client) to the TWS or IB Gateway API (server) written in the Ada programming language. It serves to make an automated trading bot through IB.
+- ib-ada is a 'semi-thick' TCP message-based request/response communication library (client) to the TWS or IB Gateway API (server) written in the Ada programming language. It serves to make automated trading bots over IB.
 
 - I started this project because every other 'equivalent' implementation I tested did not work for my use case, for one reason or another, ... and I tried most of them all (C++, C#, Python, JS, official and third-party. I gave up at the idea of installing a whole Java developer environment just to test if, maybe, this time the outcome would be different).
 
