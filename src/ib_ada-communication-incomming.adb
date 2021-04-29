@@ -420,8 +420,8 @@ begin
 
    msg_definitions.include(+"0",  (server_infos,           codes((1 => 0)),                  handle_session_datetime_msg'access));
    msg_definitions.include(+"15", (managed_accounts,       codes((1 => 15, 2 => 1)),         handle_managed_accounts_msg'access));
-   msg_definitions.include(+"9",  (next_valid_req_number,          codes((1 => 9, 2 => 1)),          handle_next_valid_req_number_msg'access));
-   msg_definitions.include(+"4",  (status,                  codes((1 => 4, 2 => 2, 3 => -1)), handle_status_msg'access));
+   msg_definitions.include(+"9",  (next_valid_req_number,  codes((1 => 9, 2 => 1)),          handle_next_valid_req_number_msg'access));
+   msg_definitions.include(+"4",  (status,                 codes((1 => 4, 2 => 2, 3 => -1)), handle_status_msg'access));
    msg_definitions.include(+"61", (positions,              codes((1 => 61,  2 => 3)),        handle_position_msg'access));
    msg_definitions.include(+"62", (positions_end,          codes((1 => 62,  2 => 1)),        handle_position_end_msg'access));
    msg_definitions.include(+"63", (account_summary,        codes((1 => 63, 2 => 1)),         handle_account_summary_msg'access));
